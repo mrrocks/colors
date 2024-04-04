@@ -66,7 +66,7 @@ function refreshColorGrid() {
     colorGridElement.appendChild(colorBlock);
   });
   const colorCountDisplay = document.getElementById('colorCountDisplay');
-  colorCountDisplay.textContent = `Final number of colors: ${colorPalette.length}`;
+  colorCountDisplay.textContent = colorPalette.length;
 }
 
 luminositySlider.addEventListener('input', () => {
