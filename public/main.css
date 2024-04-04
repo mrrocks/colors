@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+#colorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 100px), 1fr));
+  gap: 2px;
+
+  height: 100vh;
+  overflow: auto;
+}
+
+#colorGrid div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  width: 100%;
+  height: calc((100vh - (var(--num-rows))) / var(--num-rows));
+}

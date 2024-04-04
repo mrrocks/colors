@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="module" src="main.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <label for="luminosityInput">Luminosity:</label>
+      <input
+        type="range"
+        id="luminosityInput"
+        min="0.2"
+        max="0.8"
+        step="0.05"
+        value="0.4"
+      />
+      <span id="luminosityValue">0.4</span>
+    </div>
+    <div>
+      <label for="colorCountInput">Number of colors before filtering:</label>
+      <input type="range" id="colorCountInput" min="20" max="200" value="60" />
+      <span id="colorCountValue">60</span>
+    </div>
+    <div>
+      <label for="thresholdInput">Threshold:</label>
+      <input type="range" id="thresholdInput" min="1" max="100" value="5" />
+      <span id="thresholdValue">5</span>
+    </div>
+    <div id="colorGrid"></div>
+  </body>
+</html>
