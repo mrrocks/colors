@@ -47,26 +47,42 @@ function filterUniqueColors(colors, minimumDistance) {
   return uniqueColors;
 }
 
-function refreshColorGrid() {
-  const luminosity = parseFloat(luminositySlider.value);
-  const colorQuantity = parseInt(colorQuantitySlider.value);
-  const distinctThreshold = parseInt(distinctThresholdSlider.value);
-  let colorPalette = chroma
+function generateColorPalette(colorQuantity, luminosity) {
+  return chroma
     .scale(['gray', ...chroma.brewer.Spectral])
     .mode('lch')
     .colors(colorQuantity)
     .map((color) => chroma(color).luminance(luminosity));
+}
+
+function createColorBlock(color) {
+  const colorBlock = document.createElement('div');
+  colorBlock.style.backgroundColor = color;
+  colorBlock.style.color = determineTextColor(color);
+  colorBlock.innerText = chroma(color).hex();
+  return colorBlock;
+}
+
+function updateColorCountDisplay(colorPaletteLength) {
+  const colorCountDisplay = document.getElementById('colorCountDisplay');
+  colorCountDisplay.textContent = colorPaletteLength;
+}
+
+function refreshColorGrid() {
+  const luminosity = parseFloat(luminositySlider.value);
+  const colorQuantity = parseInt(colorQuantitySlider.value);
+  const distinctThreshold = parseInt(distinctThresholdSlider.value);
+
+  let colorPalette = generateColorPalette(colorQuantity, luminosity);
   colorPalette = filterUniqueColors(colorPalette, distinctThreshold);
+
   colorGridElement.innerHTML = '';
   colorPalette.forEach((color) => {
-    const colorBlock = document.createElement('div');
-    colorBlock.style.backgroundColor = color;
-    colorBlock.style.color = determineTextColor(color);
-    colorBlock.innerText = chroma(color).hex();
+    const colorBlock = createColorBlock(color);
     colorGridElement.appendChild(colorBlock);
   });
-  const colorCountDisplay = document.getElementById('colorCountDisplay');
-  colorCountDisplay.textContent = colorPalette.length;
+
+  updateColorCountDisplay(colorPalette.length);
 }
 
 luminositySlider.addEventListener('input', () => {
