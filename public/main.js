@@ -3,8 +3,8 @@ import { APCAcontrast, sRGBtoY } from 'apca-w3';
 
 const luminositySlider = document.getElementById('luminosityInput');
 const luminosityDisplay = document.getElementById('luminosityValue');
-const colorQuantitySlider = document.getElementById('colorCountInput');
-const colorQuantityDisplay = document.getElementById('colorCountValue');
+// const colorQuantitySlider = document.getElementById('colorCountInput');
+// const colorQuantityDisplay = document.getElementById('colorCountValue');
 const distinctThresholdSlider = document.getElementById('thresholdInput');
 const distinctThresholdDisplay = document.getElementById('thresholdValue');
 const saturationSlider = document.getElementById('saturationInput');
@@ -73,7 +73,7 @@ function updateColorCountDisplay(colorPaletteLength) {
 
 function refreshColorGrid() {
   const luminosity = parseFloat(luminositySlider.value);
-  const colorQuantity = parseInt(colorQuantitySlider.value);
+  const colorQuantity = 200; // parseInt(colorQuantitySlider.value);
   const distinctThreshold = parseInt(distinctThresholdSlider.value);
   const saturation = parseFloat(saturationSlider.value);
 
@@ -98,10 +98,10 @@ luminositySlider.addEventListener('input', () => {
   refreshColorGrid();
 });
 
-colorQuantitySlider.addEventListener('input', () => {
-  colorQuantityDisplay.textContent = colorQuantitySlider.value;
-  refreshColorGrid();
-});
+// colorQuantitySlider.addEventListener('input', () => {
+//   colorQuantityDisplay.textContent = colorQuantitySlider.value;
+//   refreshColorGrid();
+// });
 
 distinctThresholdSlider.addEventListener('input', () => {
   distinctThresholdDisplay.textContent = distinctThresholdSlider.value;
