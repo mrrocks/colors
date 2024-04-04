@@ -1,34 +1,52 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="module" src="main.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <title>Document</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script type="module" src="main.js"></script>
-  <link rel="stylesheet" href="main.css" />
-  <title>Document</title>
-</head>
-
-<body>
-  <div class="controls">
-    <div>
-      <label for="luminosityInput">Luminosity:</label>
-      <input type="range" id="luminosityInput" min="0.1" max="0.8" step="0.01" value="0.4" />
-      <span id="luminosityValue">0.4</span>
+  <body>
+    <div class="controls">
+      <div>
+        <label for="luminosityInput">Luminosity</label>
+        <input
+          type="range"
+          id="luminosityInput"
+          min="0.1"
+          max="0.8"
+          step="0.01"
+          value="0.4"
+        />
+        <span id="luminosityValue">0.4</span>
+      </div>
+      <div>
+        <label for="colorCountInput">Initial color count</label>
+        <input
+          type="range"
+          id="colorCountInput"
+          min="20"
+          max="200"
+          value="200"
+        />
+        <span id="colorCountValue">200</span>
+      </div>
+      <div>
+        <label for="thresholdInput">Minimum color difference</label>
+        <input
+          type="range"
+          id="thresholdInput"
+          min="0"
+          max="20"
+          value="4"
+          step="0.5"
+        />
+        <span id="thresholdValue">4</span>
+      </div>
+      <div id="colorCountDisplay">Final number of colors: 0</div>
     </div>
-    <div>
-      <label for="colorCountInput">Number of colors before filtering:</label>
-      <input type="range" id="colorCountInput" min="20" max="200" value="60" />
-      <span id="colorCountValue">60</span>
-    </div>
-    <div>
-      <label for="thresholdInput">Filtering threshold (how much difference should be between colors):</label>
-      <input type="range" id="thresholdInput" min="0" max="20" value="4" step="1" />
-      <span id="thresholdValue">4</span>
-    </div>
-    <div id="colorCountDisplay">Final number of colors: 0</div>
-  </div>
-  <div id="colorGrid"></div>
-</body>
-
+    <div id="colorGrid"></div>
+  </body>
 </html>

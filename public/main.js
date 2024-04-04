@@ -1,85 +1,87 @@
 import chroma from 'chroma-js';
 import { APCAcontrast } from 'apca-w3';
 
-const luminosityInput = document.getElementById('luminosityInput');
-const luminosityValue = document.getElementById('luminosityValue');
-const colorCountInput = document.getElementById('colorCountInput');
-const colorCountValue = document.getElementById('colorCountValue');
-const gridContainer = document.getElementById('colorGrid');
-const thresholdInput = document.getElementById('thresholdInput');
-const thresholdValue = document.getElementById('thresholdValue');
+const luminositySlider = document.getElementById('luminosityInput');
+const luminosityDisplay = document.getElementById('luminosityValue');
+const colorQuantitySlider = document.getElementById('colorCountInput');
+const colorQuantityDisplay = document.getElementById('colorCountValue');
+const distinctThresholdSlider = document.getElementById('thresholdInput');
+const distinctThresholdDisplay = document.getElementById('thresholdValue');
+const colorGridElement = document.getElementById('colorGrid');
 
-function updateColors() {
-  const luminosity = parseFloat(luminosityInput.value);
-  const colorCount = parseInt(colorCountInput.value);
-  const threshold = parseInt(thresholdInput.value);
-
-  let colorScale = chroma
-    .scale(['gray', ...chroma.brewer.Spectral])
-    .mode('lch')
-    .colors(colorCount)
-    .map((color) => chroma(color).luminance(luminosity));
-  colorScale = filterDistinctColors(colorScale, threshold);
-
-  gridContainer.innerHTML = '';
-
-  colorScale.forEach((color) => {
-    const colorDiv = document.createElement('div');
-    colorDiv.style.backgroundColor = color;
-    colorDiv.style.color = getTextColor(color);
-    colorDiv.innerText = chroma(color).hex();
-    gridContainer.appendChild(colorDiv);
-  });
-
-  const colorCountDisplay = document.getElementById('colorCountDisplay');
-  colorCountDisplay.textContent = `Final number of colors: ${colorScale.length}`;
-}
-
-luminosityInput.addEventListener('input', () => {
-  luminosityValue.textContent = luminosityInput.value;
-  updateColors();
-});
-
-colorCountInput.addEventListener('input', () => {
-  colorCountValue.textContent = colorCountInput.value;
-  updateColors();
-});
-
-thresholdInput.addEventListener('input', () => {
-  thresholdValue.textContent = thresholdInput.value;
-  updateColors();
-});
-
-function filterDistinctColors(colors, threshold) {
-  const distinctColors = [];
-
-  colors.forEach((color) => {
-    const isDistinct = distinctColors.every(
-      (distinctColor) => chroma.distance(color, distinctColor) >= threshold,
-    );
-
-    if (isDistinct) {
-      distinctColors.push(color);
-    }
-  });
-
-  return distinctColors;
-}
-
-function sRGBtoY(color) {
+function convertSRGBToLuminance(color) {
   const [r, g, b] = color.map((c) => c / 255);
-  const R = r <= 0.04045 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
-  const G = g <= 0.04045 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
-  const B = b <= 0.04045 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+  const R = r <= 0.04045 ? r / 12.92 : ((r + 0.055) / 1.055) ** 2.4;
+  const G = g <= 0.04045 ? g / 12.92 : ((g + 0.055) / 1.055) ** 2.4;
+  const B = b <= 0.04045 ? b / 12.92 : ((b + 0.055) / 1.055) ** 2.4;
   return 0.2126 * R + 0.7152 * G + 0.0722 * B;
 }
 
-function getTextColor(backgroundColor) {
-  const bgY = sRGBtoY(chroma(backgroundColor).rgb());
-  const whiteContrast = APCAcontrast(sRGBtoY([255, 255, 255]), bgY);
-  const blackContrast = APCAcontrast(sRGBtoY([0, 0, 0]), bgY);
-
-  return Math.abs(whiteContrast) > Math.abs(blackContrast) ? 'white' : 'black';
+function determineTextColor(backgroundColor) {
+  const backgroundLuminance = convertSRGBToLuminance(
+    chroma(backgroundColor).rgb(),
+  );
+  const contrastWithWhite = APCAcontrast(
+    convertSRGBToLuminance([255, 255, 255]),
+    backgroundLuminance,
+  );
+  const contrastWithBlack = APCAcontrast(
+    convertSRGBToLuminance([0, 0, 0]),
+    backgroundLuminance,
+  );
+  return Math.abs(contrastWithWhite) > Math.abs(contrastWithBlack)
+    ? 'white'
+    : 'black';
 }
 
-updateColors();
+function filterUniqueColors(colors, minimumDistance) {
+  const uniqueColors = [];
+  colors.forEach((color) => {
+    const isUnique = uniqueColors.every(
+      (uniqueColor) => chroma.distance(color, uniqueColor) >= minimumDistance,
+    );
+    if (isUnique) {
+      uniqueColors.push(color);
+    }
+  });
+  return uniqueColors;
+}
+
+function refreshColorGrid() {
+  const luminosity = parseFloat(luminositySlider.value);
+  const colorQuantity = parseInt(colorQuantitySlider.value);
+  const distinctThreshold = parseInt(distinctThresholdSlider.value);
+  let colorPalette = chroma
+    .scale(['gray', ...chroma.brewer.Spectral])
+    .mode('lch')
+    .colors(colorQuantity)
+    .map((color) => chroma(color).luminance(luminosity));
+  colorPalette = filterUniqueColors(colorPalette, distinctThreshold);
+  colorGridElement.innerHTML = '';
+  colorPalette.forEach((color) => {
+    const colorBlock = document.createElement('div');
+    colorBlock.style.backgroundColor = color;
+    colorBlock.style.color = determineTextColor(color);
+    colorBlock.innerText = chroma(color).hex();
+    colorGridElement.appendChild(colorBlock);
+  });
+  const colorCountDisplay = document.getElementById('colorCountDisplay');
+  colorCountDisplay.textContent = `Final number of colors: ${colorPalette.length}`;
+}
+
+luminositySlider.addEventListener('input', () => {
+  luminosityDisplay.textContent = luminositySlider.value;
+  refreshColorGrid();
+});
+
+colorQuantitySlider.addEventListener('input', () => {
+  colorQuantityDisplay.textContent = colorQuantitySlider.value;
+  refreshColorGrid();
+});
+
+distinctThresholdSlider.addEventListener('input', () => {
+  distinctThresholdDisplay.textContent = distinctThresholdSlider.value;
+  refreshColorGrid();
+});
+
+refreshColorGrid();
