@@ -1,44 +1,76 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <script type="module" src="main.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <title>Color Gen</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" as="style"
-    onload="this.onload=null;this.rel='stylesheet'" />
-  <script type="module" src="main.js"></script>
-  <link rel="stylesheet" href="main.css" />
-  <title>Color Gen</title>
-</head>
-
-<body>
-  <div class="controls">
-    <div class="control">
-      <label for="luminosityInput">Luminosity</label>
-      <input type="range" id="luminosityInput" min="0.01" max="0.89" step="0.01" value="0.4" />
-      <span id="luminosityValue">0.4</span>
+  <body>
+    <div class="controls">
+      <div class="control">
+        <label for="luminosityInput">Luminosity</label>
+        <input
+          type="range"
+          id="luminosityInput"
+          min="0.01"
+          max="0.89"
+          step="0.01"
+          value="0.4"
+        />
+        <span id="luminosityValue">0.4</span>
+      </div>
+      <div class="control">
+        <label for="colorCountInput">Initial color count</label>
+        <input
+          type="range"
+          id="colorCountInput"
+          min="20"
+          max="200"
+          value="200"
+          step="1"
+        />
+        <span id="colorCountValue">200</span>
+      </div>
+      <div class="control">
+        <label for="thresholdInput">Minimum color difference</label>
+        <input
+          type="range"
+          id="thresholdInput"
+          min="0"
+          max="20"
+          value="8"
+          step="0.5"
+        />
+        <span id="thresholdValue">8</span>
+      </div>
+      <div class="control">
+        <label for="saturationInput"
+          >Saturation <span>Don't! Will break uniform luminosity</span></label
+        >
+        <input
+          type="range"
+          id="saturationInput"
+          min="1"
+          max="2"
+          step="0.1"
+          value="1"
+        />
+        <span id="saturationValue">1</span>
+      </div>
+      <div class="control">
+        <label>Final number of colors</label>
+        <div id="colorCountDisplay">0</div>
+      </div>
     </div>
-    <div class="control">
-      <label for="colorCountInput">Initial color count</label>
-      <input type="range" id="colorCountInput" min="20" max="200" value="200" step="1" />
-      <span id="colorCountValue">200</span>
-    </div>
-    <div class="control">
-      <label for="thresholdInput">Minimum color difference</label>
-      <input type="range" id="thresholdInput" min="0" max="20" value="8" step="0.5" />
-      <span id="thresholdValue">8</span>
-    </div>
-    <div class="control">
-      <label for="saturationInput">Saturation <span>Don't! Will break uniform luminosity</span></label>
-      <input type="range" id="saturationInput" min="1" max="2" step="0.1" value="1" />
-      <span id="saturationValue">1</span>
-    </div>
-    <div class="control">
-      <label>Final number of colors</label>
-      <div id="colorCountDisplay">0</div>
-    </div>
-  </div>
-  <div id="colorGrid"></div>
-</body>
-
+    <div id="colorGrid"></div>
+  </body>
 </html>

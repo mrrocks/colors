@@ -1,5 +1,5 @@
 import chroma from 'chroma-js';
-import { APCAcontrast } from 'apca-w3';
+import { APCAcontrast, sRGBtoY } from 'apca-w3';
 
 const luminositySlider = document.getElementById('luminosityInput');
 const luminosityDisplay = document.getElementById('luminosityValue');
@@ -11,24 +11,14 @@ const saturationSlider = document.getElementById('saturationInput');
 const saturationDisplay = document.getElementById('saturationValue');
 const colorGridElement = document.getElementById('colorGrid');
 
-function convertSRGBToLuminance(color) {
-  const [r, g, b] = color.map((c) => c / 255);
-  const R = r <= 0.04045 ? r / 12.92 : ((r + 0.055) / 1.055) ** 2.4;
-  const G = g <= 0.04045 ? g / 12.92 : ((g + 0.055) / 1.055) ** 2.4;
-  const B = b <= 0.04045 ? b / 12.92 : ((b + 0.055) / 1.055) ** 2.4;
-  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
-}
-
 function determineTextColor(backgroundColor) {
-  const backgroundLuminance = convertSRGBToLuminance(
-    chroma(backgroundColor).rgb(),
-  );
+  const backgroundLuminance = sRGBtoY(chroma(backgroundColor).rgb());
   const contrastWithWhite = APCAcontrast(
-    convertSRGBToLuminance([255, 255, 255]),
+    sRGBtoY([255, 255, 255]),
     backgroundLuminance,
   );
   const contrastWithBlack = APCAcontrast(
-    convertSRGBToLuminance([0, 0, 0]),
+    sRGBtoY([0, 0, 0]),
     backgroundLuminance,
   );
   return Math.abs(contrastWithWhite) > Math.abs(contrastWithBlack)
