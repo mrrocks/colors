@@ -15,7 +15,7 @@ function determineTextColor(backgroundColor) {
   const backgroundLuminance = sRGBtoY(chroma(backgroundColor).rgb());
   const colorsWithOpacity = {
     white: [255, 255, 255, 0.92],
-    black: [0, 0, 0, 0.87],
+    black: [0, 0, 0, 0.92],
   };
   const contrastWithWhite = APCAcontrast(
     sRGBtoY(chroma(colorsWithOpacity.white).rgb()),
