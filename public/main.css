@@ -29,6 +29,7 @@ body {
   text-align: center;
   width: 100%;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .controls {
