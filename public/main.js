@@ -13,17 +13,22 @@ const colorGridElement = document.getElementById('colorGrid');
 
 function determineTextColor(backgroundColor) {
   const backgroundLuminance = sRGBtoY(chroma(backgroundColor).rgb());
+  const colorsWithOpacity = {
+    white: [255, 255, 255, 0.87],
+    black: [0, 0, 0, 0.87],
+  };
   const contrastWithWhite = APCAcontrast(
-    sRGBtoY([255, 255, 255]),
+    sRGBtoY(chroma(colorsWithOpacity.white).rgb()),
     backgroundLuminance,
   );
   const contrastWithBlack = APCAcontrast(
-    sRGBtoY([0, 0, 0]),
+    sRGBtoY(chroma(colorsWithOpacity.black).rgb()),
     backgroundLuminance,
   );
+
   return Math.abs(contrastWithWhite) > Math.abs(contrastWithBlack)
-    ? 'white'
-    : 'black';
+    ? `rgba(${colorsWithOpacity.white.join(',')})`
+    : `rgba(${colorsWithOpacity.black.join(',')})`;
 }
 
 function filterUniqueColors(colors, minimumDistance) {
