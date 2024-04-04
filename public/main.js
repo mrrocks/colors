@@ -1,13 +1,13 @@
-import chroma from "chroma-js";
-import { APCAcontrast } from "apca-w3";
+import chroma from 'chroma-js';
+import { APCAcontrast } from 'apca-w3';
 
-const luminosityInput = document.getElementById("luminosityInput");
-const luminosityValue = document.getElementById("luminosityValue");
-const colorCountInput = document.getElementById("colorCountInput");
-const colorCountValue = document.getElementById("colorCountValue");
-const gridContainer = document.getElementById("colorGrid");
-const thresholdInput = document.getElementById("thresholdInput");
-const thresholdValue = document.getElementById("thresholdValue");
+const luminosityInput = document.getElementById('luminosityInput');
+const luminosityValue = document.getElementById('luminosityValue');
+const colorCountInput = document.getElementById('colorCountInput');
+const colorCountValue = document.getElementById('colorCountValue');
+const gridContainer = document.getElementById('colorGrid');
+const thresholdInput = document.getElementById('thresholdInput');
+const thresholdValue = document.getElementById('thresholdValue');
 
 function updateColors() {
   const luminosity = parseFloat(luminosityInput.value);
@@ -15,34 +15,37 @@ function updateColors() {
   const threshold = parseInt(thresholdInput.value);
 
   let colorScale = chroma
-    .scale("Spectral")
-    .mode("lch")
+    .scale(['gray', ...chroma.brewer.Spectral])
+    .mode('lch')
     .colors(colorCount)
     .map((color) => chroma(color).luminance(luminosity));
   colorScale = filterDistinctColors(colorScale, threshold);
 
-  gridContainer.innerHTML = "";
+  gridContainer.innerHTML = '';
 
   colorScale.forEach((color) => {
-    const colorDiv = document.createElement("div");
+    const colorDiv = document.createElement('div');
     colorDiv.style.backgroundColor = color;
     colorDiv.style.color = getTextColor(color);
-    colorDiv.innerText = "AA";
+    colorDiv.innerText = chroma(color).hex();
     gridContainer.appendChild(colorDiv);
   });
+
+  const colorCountDisplay = document.getElementById('colorCountDisplay');
+  colorCountDisplay.textContent = `Final number of colors: ${colorScale.length}`;
 }
 
-luminosityInput.addEventListener("input", () => {
+luminosityInput.addEventListener('input', () => {
   luminosityValue.textContent = luminosityInput.value;
   updateColors();
 });
 
-colorCountInput.addEventListener("input", () => {
+colorCountInput.addEventListener('input', () => {
   colorCountValue.textContent = colorCountInput.value;
   updateColors();
 });
 
-thresholdInput.addEventListener("input", () => {
+thresholdInput.addEventListener('input', () => {
   thresholdValue.textContent = thresholdInput.value;
   updateColors();
 });
@@ -52,7 +55,7 @@ function filterDistinctColors(colors, threshold) {
 
   colors.forEach((color) => {
     const isDistinct = distinctColors.every(
-      (distinctColor) => chroma.distance(color, distinctColor) >= threshold
+      (distinctColor) => chroma.distance(color, distinctColor) >= threshold,
     );
 
     if (isDistinct) {
@@ -76,7 +79,7 @@ function getTextColor(backgroundColor) {
   const whiteContrast = APCAcontrast(sRGBtoY([255, 255, 255]), bgY);
   const blackContrast = APCAcontrast(sRGBtoY([0, 0, 0]), bgY);
 
-  return Math.abs(whiteContrast) > Math.abs(blackContrast) ? "white" : "black";
+  return Math.abs(whiteContrast) > Math.abs(blackContrast) ? 'white' : 'black';
 }
 
 updateColors();
