@@ -7,6 +7,8 @@ const colorQuantitySlider = document.getElementById('colorCountInput');
 const colorQuantityDisplay = document.getElementById('colorCountValue');
 const distinctThresholdSlider = document.getElementById('thresholdInput');
 const distinctThresholdDisplay = document.getElementById('thresholdValue');
+const saturationSlider = document.getElementById('saturationInput');
+const saturationDisplay = document.getElementById('saturationValue');
 const colorGridElement = document.getElementById('colorGrid');
 
 function convertSRGBToLuminance(color) {
@@ -47,12 +49,18 @@ function filterUniqueColors(colors, minimumDistance) {
   return uniqueColors;
 }
 
-function generateColorPalette(colorQuantity, luminosity) {
-  return chroma
+function generateColorPalette(colorQuantity, luminosity, saturation) {
+  let colors = chroma
     .scale(['gray', ...chroma.brewer.Spectral])
     .mode('lch')
     .colors(colorQuantity)
     .map((color) => chroma(color).luminance(luminosity));
+
+  if (saturation !== 1) {
+    colors = colors.map((color) => chroma(color).saturate(saturation - 1));
+  }
+
+  return colors;
 }
 
 function createColorBlock(color) {
@@ -72,8 +80,13 @@ function refreshColorGrid() {
   const luminosity = parseFloat(luminositySlider.value);
   const colorQuantity = parseInt(colorQuantitySlider.value);
   const distinctThreshold = parseInt(distinctThresholdSlider.value);
+  const saturation = parseFloat(saturationSlider.value);
 
-  let colorPalette = generateColorPalette(colorQuantity, luminosity);
+  let colorPalette = generateColorPalette(
+    colorQuantity,
+    luminosity,
+    saturation,
+  );
   colorPalette = filterUniqueColors(colorPalette, distinctThreshold);
 
   colorGridElement.innerHTML = '';
@@ -97,6 +110,11 @@ colorQuantitySlider.addEventListener('input', () => {
 
 distinctThresholdSlider.addEventListener('input', () => {
   distinctThresholdDisplay.textContent = distinctThresholdSlider.value;
+  refreshColorGrid();
+});
+
+saturationSlider.addEventListener('input', () => {
+  saturationDisplay.textContent = saturationSlider.value;
   refreshColorGrid();
 });
 
