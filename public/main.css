@@ -42,16 +42,21 @@ body {
   display: flex;
   flex-direction: row;
   gap: 12px;
+  font-size: 14px;
 }
 
 .control label {
   font-weight: 500;
 }
 
-.control > * {
-  flex: 0 0 200px; /* Do not grow, do not shrink, start at 200px */
+.control > *:first-child {
+  flex: 0 0 180px;
+}
+.control > *:nth-child(2) {
+  flex: 0 1 200px;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .control > span {
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.5);
 }
