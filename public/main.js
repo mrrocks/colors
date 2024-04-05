@@ -46,14 +46,14 @@ function filterUniqueColors(colors, minimumDistance) {
 
 function generateColorPalette(colorQuantity, luminosity, saturation) {
   let colors = chroma
-    .scale(['gray', ...chroma.brewer.Spectral])
+    .scale([...chroma.brewer.Spectral])
     .mode('lch')
     .colors(colorQuantity)
-    .map((color) => chroma(color).luminance(luminosity));
-
-  if (saturation !== 1) {
-    colors = colors.map((color) => chroma(color).saturate(saturation - 1));
-  }
+    .map((color) =>
+      chroma(color)
+        .saturate(saturation - 1)
+        .luminance(luminosity),
+    );
 
   return colors;
 }
