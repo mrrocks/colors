@@ -11,22 +11,16 @@ const colorGridElement = document.getElementById('colorGrid');
 
 function determineTextColor(backgroundColor) {
   const backgroundLuminance = sRGBtoY(chroma(backgroundColor).rgb());
-  const colorsWithOpacity = {
-    white: [255, 255, 255, 0.92],
-    black: [0, 0, 0, 0.92],
-  };
-  const contrastWithWhite = APCAcontrast(
-    sRGBtoY(chroma(colorsWithOpacity.white).rgb()),
-    backgroundLuminance,
-  );
-  const contrastWithBlack = APCAcontrast(
-    sRGBtoY(chroma(colorsWithOpacity.black).rgb()),
-    backgroundLuminance,
-  );
+
+  const whiteLuminance = sRGBtoY([255, 255, 255]);
+  const blackLuminance = sRGBtoY([0, 0, 0]);
+
+  const contrastWithWhite = APCAcontrast(whiteLuminance, backgroundLuminance);
+  const contrastWithBlack = APCAcontrast(blackLuminance, backgroundLuminance);
 
   return Math.abs(contrastWithWhite) > Math.abs(contrastWithBlack)
-    ? `rgba(${colorsWithOpacity.white.join(',')})`
-    : `rgba(${colorsWithOpacity.black.join(',')})`;
+    ? 'rgba(255, 255, 255, 0.92)'
+    : 'rgba(0, 0, 0, 0.92)';
 }
 
 function filterUniqueColors(colors, minimumDistance) {
@@ -47,7 +41,7 @@ function generateColorPalette(colorQuantity, luminosity, chromaValue) {
   const startHue = 16;
   for (let i = 0; i < colorQuantity; i++) {
     const hue = startHue + (i / colorQuantity) * 344;
-    const color = chroma.lch(luminosity, chromaValue, hue);
+    const color = chroma.oklch(luminosity, chromaValue, hue);
     colors.push(color);
   }
   return colors;
@@ -68,9 +62,9 @@ function updateColorCountDisplay(colorPaletteLength) {
 
 function refreshColorGrid() {
   const colorQuantity = 200;
-  const luminosity = parseFloat(luminositySlider.value);
+  const luminosity = parseFloat(luminositySlider.value) / 100;
+  const chromaValue = parseFloat(saturationSlider.value) / 100;
   const distinctThreshold = parseInt(distinctThresholdSlider.value);
-  const chromaValue = parseFloat(saturationSlider.value);
 
   let colorPalette = generateColorPalette(
     colorQuantity,
