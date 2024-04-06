@@ -49,9 +49,10 @@ function generateColorPalette(colorQuantity, luminosity, chromaValue) {
 
 function createColorBlock(color) {
   const colorBlock = document.createElement('div');
-  colorBlock.style.backgroundColor = color;
-  colorBlock.style.color = determineTextColor(color);
-  colorBlock.innerText = chroma(color).hex();
+  const [l, c, h] = color.oklch();
+  colorBlock.style.backgroundColor = `oklch(${l} ${c} ${h})`;
+  colorBlock.style.color = determineTextColor(color.hex());
+  colorBlock.innerText = color.hex();
   return colorBlock;
 }
 
