@@ -1,11 +1,8 @@
 import chroma from 'chroma-js';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
-import Color from 'colorjs.io';
 
 const luminositySlider = document.getElementById('luminosityInput');
 const luminosityDisplay = document.getElementById('luminosityValue');
-// const colorQuantitySlider = document.getElementById('colorCountInput');
-// const colorQuantityDisplay = document.getElementById('colorCountValue');
 const distinctThresholdSlider = document.getElementById('thresholdInput');
 const distinctThresholdDisplay = document.getElementById('thresholdValue');
 const saturationSlider = document.getElementById('saturationInput');
@@ -47,11 +44,11 @@ function filterUniqueColors(colors, minimumDistance) {
 
 function generateColorPalette(colorQuantity, luminosity, chromaValue) {
   let colors = [];
-  const startHue = 60; // Starting hue at 60 degrees
+  const startHue = 16;
   for (let i = 0; i < colorQuantity; i++) {
-    const hue = startHue + (i / colorQuantity) * 300; // Adjust hue range to start at 60
-    const color = chroma.lch(luminosity, chromaValue, hue); // Use LCH color space with dynamic luminosity and chroma
-    colors.push(color.hex()); // Convert to hex and add to the array
+    const hue = startHue + (i / colorQuantity) * 344;
+    const color = chroma.lch(luminosity, chromaValue, hue);
+    colors.push(color);
   }
   return colors;
 }
@@ -96,11 +93,6 @@ luminositySlider.addEventListener('input', () => {
   refreshColorGrid();
 });
 
-// colorQuantitySlider.addEventListener('input', () => {
-//   colorQuantityDisplay.textContent = colorQuantitySlider.value;
-//   refreshColorGrid();
-// });
-
 distinctThresholdSlider.addEventListener('input', () => {
   distinctThresholdDisplay.textContent = distinctThresholdSlider.value;
   refreshColorGrid();
@@ -112,5 +104,3 @@ saturationSlider.addEventListener('input', () => {
 });
 
 refreshColorGrid();
-
-// color js

@@ -16,7 +16,7 @@ body {
 
 #colorGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 100px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 92px), 1fr));
   gap: 2px;
   overflow: auto;
   flex-grow: 1;
@@ -30,13 +30,14 @@ body {
   width: 100%;
   text-transform: uppercase;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .controls {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .control {
