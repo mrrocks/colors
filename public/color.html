@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 50px);
+      gap: 5px;
+    }
+
+    .color-block {
+      width: 50px;
+      height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="colorGrid" class="color-grid"></div>
+
+  <!-- Include Color.js from a CDN -->
+  <script>
+    function generateP3Palette() {
+      const steps = 100;
+      const palette = [];
+
+      for (let i = 0; i < steps; i++) {
+        const red = Math.sin(i / steps * 2 * Math.PI) * 0.5 + 0.5;
+        const green = Math.sin(i / steps * 2 * Math.PI + 2 * Math.PI / 3) * 0.5 + 0.5;
+        const blue = Math.sin(i / steps * 2 * Math.PI + 4 * Math.PI / 3) * 0.5 + 0.5;
+        const color = `color(display-p3 ${red} ${green} ${blue})`;
+        palette.push(color);
+      }
+
+      return palette;
+    }
+
+    function renderColorGrid(palette) {
+      const colorGrid = document.getElementById('colorGrid');
+
+      palette.forEach(color => {
+        const colorBlock = document.createElement('div');
+        colorBlock.className = 'color-block';
+        colorBlock.style.backgroundColor = color;
+        colorGrid.appendChild(colorBlock);
+      });
+    }
+
+    const p3Palette = generateP3Palette();
+    renderColorGrid(p3Palette);
+  </script>
+</body>
+
+</html>

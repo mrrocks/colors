@@ -1,5 +1,6 @@
 import chroma from 'chroma-js';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
+import Color from 'colorjs.io';
 
 const luminositySlider = document.getElementById('luminosityInput');
 const luminosityDisplay = document.getElementById('luminosityValue');
@@ -44,17 +45,14 @@ function filterUniqueColors(colors, minimumDistance) {
   return uniqueColors;
 }
 
-function generateColorPalette(colorQuantity, luminosity, saturation) {
-  let colors = chroma
-    .scale([...chroma.brewer.Spectral])
-    .mode('lch')
-    .colors(colorQuantity)
-    .map((color) =>
-      chroma(color)
-        .saturate(saturation - 1)
-        .luminance(luminosity),
-    );
-
+function generateColorPalette(colorQuantity, luminosity, chromaValue) {
+  let colors = [];
+  const startHue = 60; // Starting hue at 60 degrees
+  for (let i = 0; i < colorQuantity; i++) {
+    const hue = startHue + (i / colorQuantity) * 300; // Adjust hue range to start at 60
+    const color = chroma.lch(luminosity, chromaValue, hue); // Use LCH color space with dynamic luminosity and chroma
+    colors.push(color.hex()); // Convert to hex and add to the array
+  }
   return colors;
 }
 
@@ -72,15 +70,15 @@ function updateColorCountDisplay(colorPaletteLength) {
 }
 
 function refreshColorGrid() {
+  const colorQuantity = 200;
   const luminosity = parseFloat(luminositySlider.value);
-  const colorQuantity = 200; // parseInt(colorQuantitySlider.value);
   const distinctThreshold = parseInt(distinctThresholdSlider.value);
-  const saturation = parseFloat(saturationSlider.value);
+  const chromaValue = parseFloat(saturationSlider.value);
 
   let colorPalette = generateColorPalette(
     colorQuantity,
     luminosity,
-    saturation,
+    chromaValue,
   );
   colorPalette = filterUniqueColors(colorPalette, distinctThreshold);
 
@@ -114,3 +112,5 @@ saturationSlider.addEventListener('input', () => {
 });
 
 refreshColorGrid();
+
+// color js
