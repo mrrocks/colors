@@ -17,58 +17,43 @@
   <body>
     <div class="controls">
       <div class="control">
-        <label for="luminosityInput">Luminosity</label>
+        <label for="luminosityInput">Perceptual Luminosity</label>
         <input
           type="range"
           id="luminosityInput"
-          min="0.01"
-          max="0.89"
-          step="0.01"
-          value="0.4"
+          min="0"
+          max="100"
+          step="1"
+          value="74"
         />
-        <span id="luminosityValue">0.4</span>
+        <span id="luminosityValue">74</span>
       </div>
-      <!-- <div class="control">
-        <label for="colorCountInput">Initial color count</label>
+      <div class="control">
+        <label for="saturationInput">Chroma (Vibrancy)</label>
         <input
           type="range"
-          id="colorCountInput"
-          min="20"
-          max="200"
-          value="200"
+          id="saturationInput"
+          min="0"
+          max="36"
           step="1"
+          value="14"
         />
-        <span id="colorCountValue">200</span>
-      </div> -->
+        <span id="saturationValue">14</span>
+      </div>
       <div class="control">
-        <label for="thresholdInput">Minimum color difference</label>
+        <label for="thresholdInput">Color Difference</label>
         <input
           type="range"
           id="thresholdInput"
           min="0"
           max="20"
-          value="8"
-          step="0.5"
+          value="10"
+          step="1"
         />
-        <span id="thresholdValue">8</span>
+        <span id="thresholdValue">10</span>
       </div>
       <div class="control">
-        <label for="saturationInput"
-          >Forced saturation
-          <span>Don't! Will break uniform luminosity</span></label
-        >
-        <input
-          type="range"
-          id="saturationInput"
-          min="1"
-          max="4"
-          step="0.1"
-          value="1"
-        />
-        <span id="saturationValue">1</span>
-      </div>
-      <div class="control">
-        <label>Final number of colors</label>
+        <label>Colors</label>
         <div id="colorCountDisplay">0</div>
       </div>
     </div>
