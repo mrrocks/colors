@@ -38,7 +38,7 @@ body {
   padding: 32px;
   display: flex;
   flex-direction: row;
-  gap: 64px;
+  gap: 56px;
   justify-content: space-between;
   @media (max-width: 968px) {
     gap: 24px;
@@ -74,6 +74,7 @@ body {
 }
 
 .control span {
+  width: 24px;
   color: rgba(0, 0, 0, 0.5);
 }
 
