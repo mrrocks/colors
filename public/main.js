@@ -33,12 +33,12 @@ function uniqueColors(colors, minDist) {
 
 function colorPalette(lum, chromaVal) {
   let colors = [];
-  const startHue = 16;
-  const endHue = 360 - startHue;
-  const quantity = endHue - startHue + 1;
+  const startHue = 12;
+  const endHue = 360;
+  const quantity = endHue - startHue;
 
   for (let i = 0; i < quantity; i++) {
-    const hue = startHue + (i / (quantity - 1)) * (endHue - startHue);
+    const hue = startHue + (i / quantity) * (endHue - startHue);
     colors.push(chroma.oklch(lum, chromaVal, hue));
   }
   return colors;

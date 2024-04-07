@@ -93,8 +93,17 @@ body {
 
 .info a {
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.8);
-  /* text-decoration: none; */
+  color: rgba(0, 0, 0, 0.7);
+  text-decoration: none;
+}
+
+.info a:hover {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 1);
+}
+
+.info .number {
+  letter-spacing: 1px;
 }
 
 /* Range */
