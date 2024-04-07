@@ -81,6 +81,10 @@ body {
 .info {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.6);
+  @media (max-width: 968px) {
+    font-size: 12px;
+    line-height: 20px;
+  }
 }
 
 .info a {
@@ -107,4 +111,5 @@ input[type='range']::-webkit-slider-thumb {
   height: 12px;
   background-color: #565656;
   border-radius: 50%;
+  cursor: pointer;
 }
