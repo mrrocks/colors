@@ -31,11 +31,14 @@ function uniqueColors(colors, minDist) {
   return unique;
 }
 
-function colorPalette(quantity, lum, chromaVal) {
+function colorPalette(lum, chromaVal) {
   let colors = [];
   const startHue = 16;
+  const endHue = 360 - startHue;
+  const quantity = endHue - startHue + 1;
+
   for (let i = 0; i < quantity; i++) {
-    const hue = startHue + (i / quantity) * 344;
+    const hue = startHue + (i / (quantity - 1)) * (endHue - startHue);
     colors.push(chroma.oklch(lum, chromaVal, hue));
   }
   return colors;
@@ -56,12 +59,11 @@ function updateCount(length) {
 }
 
 function refreshGrid() {
-  const quantity = 200;
   const lum = parseFloat(lumSlider.value) / 100;
   const chromaVal = parseFloat(chromaSlider.value) / 100;
   const diff = parseInt(diffSlider.value);
 
-  let palette = colorPalette(quantity, lum, chromaVal);
+  let palette = colorPalette(lum, chromaVal);
   palette = uniqueColors(palette, diff);
 
   grid.innerHTML = '';
@@ -72,6 +74,24 @@ function refreshGrid() {
 
   updateCount(palette.length);
 }
+
+// Range
+
+const initSliderBackground = (slider) => {
+  const min = slider.min;
+  const max = slider.max;
+  const currentVal = slider.value;
+  slider.style.backgroundSize =
+    ((currentVal - min) / (max - min)) * 100 + '% 100%';
+};
+
+[lumSlider, diffSlider, chromaSlider].forEach((slider) => {
+  initSliderBackground(slider);
+
+  slider.addEventListener('input', () => initSliderBackground(slider));
+});
+
+// Event Listeners
 
 lumSlider.addEventListener('input', () => {
   lumDisplay.textContent = lumSlider.value;
