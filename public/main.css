@@ -68,8 +68,8 @@ body {
 }
 
 .control input {
-  flex: 1 1 auto;
-  max-width: 200px;
+  flex: 1 1 280px;
+  min-width: 280px;
   color: rgba(0, 0, 0, 0.5);
 }
 
