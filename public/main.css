@@ -71,6 +71,9 @@ body {
   flex: 1 1 280px;
   min-width: 280px;
   color: rgba(0, 0, 0, 0.5);
+  @media (max-width: 968px) {
+    min-width: auto;
+  }
 }
 
 .control span {
