@@ -13,6 +13,12 @@ const grid = document.getElementById('colorGrid');
 
 let palette = [];
 
+const defaultValues = {
+  lumInput: 74,
+  chromaInput: 14,
+  diffInput: 10,
+};
+
 function textColor(bgColor) {
   const bgLum = sRGBtoY(chroma(bgColor).rgb());
   const whiteLum = sRGBtoY([255, 255, 255]);
@@ -104,10 +110,12 @@ function updateUI(slider, display, value) {
   updateURLParameters();
 }
 
-function getInitialValue(slider, defaultValue) {
-  const queryParams = new URLSearchParams(window.location.search);
-  const urlValue = queryParams.get(slider.id);
-  return urlValue || localStorage.getItem(slider.id) || defaultValue;
+function saveToLocalStorage(key, value) {
+  localStorage.setItem(key, value);
+}
+
+function getFromLocalStorage(key, defaultValue) {
+  return localStorage.getItem(key) || defaultValue;
 }
 
 function initSliderAndDisplay(slider, display, defaultValue) {
@@ -115,30 +123,30 @@ function initSliderAndDisplay(slider, display, defaultValue) {
   updateUI(slider, display, initialValue);
 
   slider.addEventListener('input', () => {
-    localStorage.setItem(slider.id, slider.value);
+    saveToLocalStorage(slider.id, slider.value);
     updateUI(slider, display, slider.value);
   });
 
   display.addEventListener('input', () => {
-    localStorage.setItem(slider.id, display.value);
+    saveToLocalStorage(slider.id, display.value);
     updateUI(slider, display, display.value);
   });
 }
 
-function resetSlidersAndDisplays() {
-  const defaultValues = {
-    lumInput: 74,
-    chromaInput: 14,
-    diffInput: 10,
-  };
+function getInitialValue(slider, defaultValue) {
+  const queryParams = new URLSearchParams(window.location.search);
+  const urlValue = queryParams.get(slider.id);
+  return urlValue || getFromLocalStorage(slider.id, defaultValue);
+}
 
+function resetSlidersAndDisplays() {
   Object.entries(defaultValues).forEach(([id, defaultValue]) => {
     const slider = document.getElementById(id);
     const display = document.getElementById(id.replace('Input', 'Value'));
 
     slider.value = defaultValue;
     display.value = defaultValue;
-    localStorage.setItem(id, defaultValue);
+    saveToLocalStorage(id, defaultValue);
     updateSliderBackground(slider, defaultValue);
   });
 
@@ -180,9 +188,11 @@ function setupEventListeners() {
 
 function init() {
   setupEventListeners();
-  initSliderAndDisplay(lumSlider, lumDisplay, '74');
-  initSliderAndDisplay(chromaSlider, chromaDisplay, '14');
-  initSliderAndDisplay(diffSlider, diffDisplay, '10');
+  Object.entries(defaultValues).forEach(([id, value]) => {
+    const slider = document.getElementById(id);
+    const display = document.getElementById(`${id.replace('Input', 'Value')}`);
+    initSliderAndDisplay(slider, display, value.toString());
+  });
 }
 
 init();
