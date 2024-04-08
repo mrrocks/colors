@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "clean": "rm -rf .parcel-cache dist",
+    "prestart": "npm run clean",
     "start": "parcel public/index.html",
+    "prebuild": "npm run clean",
     "build": "parcel build public/index.html"
   },
   "license": "ISC",

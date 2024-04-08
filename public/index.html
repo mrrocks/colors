@@ -27,7 +27,14 @@
             step="1"
             value="74"
           />
-          <span id="lumValue">74</span>
+          <input
+            type="number"
+            id="lumValue"
+            min="0"
+            max="100"
+            step="1"
+            value="74"
+          />
         </div>
         <div class="control">
           <label for="chromaInput">Chroma (Vibrancy)</label>
@@ -39,7 +46,14 @@
             step="1"
             value="14"
           />
-          <span id="chromaValue">14</span>
+          <input
+            type="number"
+            id="chromaValue"
+            min="0"
+            max="36"
+            step="1"
+            value="14"
+          />
         </div>
         <div class="control">
           <label for="diffInput">Color Difference</label>
@@ -51,11 +65,28 @@
             value="10"
             step="1"
           />
-          <span id="diffValue">10</span>
+          <input
+            type="number"
+            id="diffValue"
+            min="0"
+            max="20"
+            step="1"
+            value="10"
+          />
         </div>
         <div class="control">
-          <label>Colors</label>
-          <div id="colorCount">0</div>
+          <label>Colors (<span id="colorCount">0</span>)</label>
+          <div class="options">
+            <div class="export">
+              <select id="colorFormat">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="oklch">OKLCH</option>
+              </select>
+              <button id="exportButton">Export</button>
+            </div>
+            <button id="resetButton">Reset</button>
+          </div>
         </div>
       </div>
       <div class="info">
