@@ -24,17 +24,6 @@ function textColor(bgColor) {
     : 'rgba(0, 0, 0, 0.92)';
 }
 
-function uniqueColors(colors, minDist) {
-  const unique = [];
-  colors.forEach((color) => {
-    const isUnique = unique.every(
-      (uc) => chroma.distance(color, uc) >= minDist,
-    );
-    if (isUnique) unique.push(color);
-  });
-  return unique;
-}
-
 function colorPalette(lum, chromaVal) {
   let colors = [];
   const startHue = 12;
@@ -46,6 +35,17 @@ function colorPalette(lum, chromaVal) {
     colors.push(chroma.oklch(lum, chromaVal, hue));
   }
   return colors;
+}
+
+function uniqueColors(colors, minDist) {
+  const unique = [];
+  colors.forEach((color) => {
+    const isUnique = unique.every(
+      (uc) => chroma.distance(color, uc) >= minDist,
+    );
+    if (isUnique) unique.push(color);
+  });
+  return unique;
 }
 
 function colorBlock(color) {
@@ -67,7 +67,6 @@ function refreshGrid() {
   const chromaVal = parseFloat(chromaSlider.value) / 100;
   const diff = parseInt(diffSlider.value);
 
-  // Update the global palette variable
   palette = colorPalette(lum, chromaVal);
   palette = uniqueColors(palette, diff);
 
@@ -78,43 +77,51 @@ function refreshGrid() {
   });
 
   updateCount(palette.length);
-
   localStorage.setItem('lum', lumSlider.value);
   localStorage.setItem('chroma', chromaSlider.value);
   localStorage.setItem('diff', diffSlider.value);
 
-  // Update URL with parameters
+  updateURLParameters();
+}
+
+function updateURLParameters() {
   const queryParams = new URLSearchParams(window.location.search);
-  queryParams.set('lum', lumSlider.value);
-  queryParams.set('chroma', chromaSlider.value);
-  queryParams.set('diff', diffSlider.value);
+  queryParams.set('L', lumSlider.value);
+  queryParams.set('C', chromaSlider.value);
+  queryParams.set('D', diffSlider.value);
   history.replaceState(null, null, '?' + queryParams.toString());
 }
 
-function initSliderAndDisplay(slider, display, defaultValue) {
-  const updateUI = (value) => {
-    slider.value = value;
-    display.value = value;
-    slider.style.backgroundSize =
-      ((value - slider.min) / (slider.max - slider.min)) * 100 + '% 100%';
-    refreshGrid();
-  };
+function updateSliderBackground(slider, value) {
+  slider.style.backgroundSize = `${((value - slider.min) / (slider.max - slider.min)) * 100}% 100%`;
+}
 
+function updateUI(slider, display, value) {
+  slider.value = value;
+  display.value = value;
+  updateSliderBackground(slider, value);
+  refreshGrid();
+  updateURLParameters();
+}
+
+function getInitialValue(slider, defaultValue) {
   const queryParams = new URLSearchParams(window.location.search);
   const urlValue = queryParams.get(slider.id);
-  const storedValue =
-    urlValue || localStorage.getItem(slider.id) || defaultValue;
-  updateUI(storedValue);
+  return urlValue || localStorage.getItem(slider.id) || defaultValue;
+}
+
+function initSliderAndDisplay(slider, display, defaultValue) {
+  const initialValue = getInitialValue(slider, defaultValue);
+  updateUI(slider, display, initialValue);
 
   slider.addEventListener('input', () => {
     localStorage.setItem(slider.id, slider.value);
-    updateUI(slider.value);
+    updateUI(slider, display, slider.value);
   });
 
   display.addEventListener('input', () => {
-    const value = display.value;
-    localStorage.setItem(slider.id, value);
-    updateUI(value);
+    localStorage.setItem(slider.id, display.value);
+    updateUI(slider, display, display.value);
   });
 }
 
@@ -132,10 +139,7 @@ function resetSlidersAndDisplays() {
     slider.value = defaultValue;
     display.value = defaultValue;
     localStorage.setItem(id, defaultValue);
-
-    slider.style.backgroundSize =
-      ((defaultValue - slider.min) / (slider.max - slider.min)) * 100 +
-      '% 100%';
+    updateSliderBackground(slider, defaultValue);
   });
 
   refreshGrid();
@@ -169,14 +173,16 @@ function exportColors() {
   document.body.removeChild(link);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initSliderAndDisplay(lumSlider, lumDisplay, 74);
-  initSliderAndDisplay(chromaSlider, chromaDisplay, 14);
-  initSliderAndDisplay(diffSlider, diffDisplay, 10);
-  refreshGrid();
-});
+function setupEventListeners() {
+  resetButton.addEventListener('click', resetSlidersAndDisplays);
+  exportButton.addEventListener('click', exportColors);
+}
 
-resetButton.addEventListener('click', resetSlidersAndDisplays);
-exportButton.addEventListener('click', exportColors);
+function init() {
+  setupEventListeners();
+  initSliderAndDisplay(lumSlider, lumDisplay, '74');
+  initSliderAndDisplay(chromaSlider, chromaDisplay, '14');
+  initSliderAndDisplay(diffSlider, diffDisplay, '10');
+}
 
-refreshGrid();
+init();
