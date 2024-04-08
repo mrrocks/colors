@@ -38,7 +38,7 @@ document
 
 function colorPalette(lum, chromaVal) {
   let colors = [];
-  const startHue = 12;
+  const startHue = 0;
   const endHue = 360;
   const quantity = endHue - startHue;
 
@@ -126,15 +126,18 @@ function refreshGrid() {
       )
     ) {
       palette = uniqueNewPalette;
-      grid.innerHTML = '';
+      const fragment = document.createDocumentFragment();
       palette.forEach((color, index) => {
         const nextColor = palette[index + 1] || palette[0];
         const block = colorBlock(color, nextColor);
-        grid.appendChild(block);
+        fragment.appendChild(block);
       });
+      grid.innerHTML = '';
+      grid.appendChild(fragment);
     }
 
     updateCount(palette.length);
+
     localStorage.setItem('lum', lumSlider.value);
     localStorage.setItem('chroma', chromaSlider.value);
     localStorage.setItem('diff', diffSlider.value);
