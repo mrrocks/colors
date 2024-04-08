@@ -80,12 +80,29 @@ function uniqueColors(colors, minDist) {
   return unique;
 }
 
-function colorBlock(color) {
+function colorBlock(color, nextColor, firstColor) {
   const block = document.createElement('div');
   const [l, c, h] = color.oklch();
   block.style.backgroundColor = `oklch(${l} ${c} ${h})`;
   block.style.color = textColor(color.hex());
-  block.innerText = color.hex();
+
+  const formatDelta = (delta) =>
+    `${(Math.round(delta * 10) / 10).toFixed(1)}% ▸`;
+
+  const deltaNext = formatDelta(
+    nextColor
+      ? chroma.deltaE(color, nextColor)
+      : chroma.deltaE(color, firstColor),
+  );
+
+  const deltaSpan = document.createElement('span');
+  deltaSpan.className = 'deltas';
+  deltaSpan.innerHTML = deltaNext;
+  deltaSpan.title = 'Relative color difference in %';
+
+  block.appendChild(document.createTextNode(color.hex()));
+  block.appendChild(deltaSpan);
+
   return block;
 }
 
@@ -111,8 +128,9 @@ function refreshGrid() {
     ) {
       palette = uniqueNewPalette;
       grid.innerHTML = '';
-      palette.forEach((color) => {
-        const block = colorBlock(color);
+      palette.forEach((color, index) => {
+        const nextColor = palette[index + 1];
+        const block = colorBlock(color, nextColor);
         grid.appendChild(block);
       });
     }
