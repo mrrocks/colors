@@ -1,7 +1,6 @@
 import chroma from 'chroma-js';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import blinder from 'color-blind';
-import { differenceCiede2000 } from 'd3-color-difference';
 
 const lumSlider = document.getElementById('lumInput');
 const diffSlider = document.getElementById('diffInput');
@@ -57,14 +56,14 @@ function uniqueColors(colors, minDist) {
 
   colors.forEach((color) => {
     const isUnique = unique.every((uc) => {
-      let distance = differenceCiede2000(color.hex(), uc.hex());
+      let distance = chroma.deltaE(color.hex(), uc.hex());
 
       if (isColorBlindMode) {
         const colorDeuteranomaly = chroma(
           blinder.deuteranomaly(color.hex()),
         ).hex();
         const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex())).hex();
-        const distanceDeuteranomaly = differenceCiede2000(
+        const distanceDeuteranomaly = chroma.deltaE(
           colorDeuteranomaly,
           ucDeuteranomaly,
         );
@@ -129,7 +128,7 @@ function refreshGrid() {
       palette = uniqueNewPalette;
       grid.innerHTML = '';
       palette.forEach((color, index) => {
-        const nextColor = palette[index + 1];
+        const nextColor = palette[index + 1] || palette[0];
         const block = colorBlock(color, nextColor);
         grid.appendChild(block);
       });
@@ -179,11 +178,13 @@ function initSliderAndDisplay(slider, display, defaultValue) {
   slider.addEventListener('input', () => {
     saveToLocalStorage(slider.id, slider.value);
     updateUI(slider, display, slider.value);
+    refreshGrid();
   });
 
   display.addEventListener('input', () => {
     saveToLocalStorage(slider.id, display.value);
     updateUI(slider, display, display.value);
+    refreshGrid();
   });
 }
 
