@@ -67,7 +67,8 @@ function refreshGrid() {
   const chromaVal = parseFloat(chromaSlider.value) / 100;
   const diff = parseInt(diffSlider.value);
 
-  palette = colorPalette(lum, chromaVal); // Update the global palette variable
+  // Update the global palette variable
+  palette = colorPalette(lum, chromaVal);
   palette = uniqueColors(palette, diff);
 
   grid.innerHTML = '';
@@ -81,6 +82,13 @@ function refreshGrid() {
   localStorage.setItem('lum', lumSlider.value);
   localStorage.setItem('chroma', chromaSlider.value);
   localStorage.setItem('diff', diffSlider.value);
+
+  // Update URL with parameters
+  const queryParams = new URLSearchParams(window.location.search);
+  queryParams.set('lum', lumSlider.value);
+  queryParams.set('chroma', chromaSlider.value);
+  queryParams.set('diff', diffSlider.value);
+  history.replaceState(null, null, '?' + queryParams.toString());
 }
 
 function initSliderAndDisplay(slider, display, defaultValue) {
@@ -92,7 +100,10 @@ function initSliderAndDisplay(slider, display, defaultValue) {
     refreshGrid();
   };
 
-  const storedValue = localStorage.getItem(slider.id) || defaultValue;
+  const queryParams = new URLSearchParams(window.location.search);
+  const urlValue = queryParams.get(slider.id);
+  const storedValue =
+    urlValue || localStorage.getItem(slider.id) || defaultValue;
   updateUI(storedValue);
 
   slider.addEventListener('input', () => {
@@ -107,14 +118,7 @@ function initSliderAndDisplay(slider, display, defaultValue) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initSliderAndDisplay(lumSlider, lumDisplay, 74);
-  initSliderAndDisplay(chromaSlider, chromaDisplay, 14);
-  initSliderAndDisplay(diffSlider, diffDisplay, 10);
-  refreshGrid();
-});
-
-resetButton.addEventListener('click', () => {
+function resetSlidersAndDisplays() {
   const defaultValues = {
     lumInput: 74,
     chromaInput: 14,
@@ -135,9 +139,9 @@ resetButton.addEventListener('click', () => {
   });
 
   refreshGrid();
-});
+}
 
-exportButton.addEventListener('click', () => {
+function exportColors() {
   const format = document.getElementById('colorFormat').value;
   let colorText = palette
     .map((color) => {
@@ -163,6 +167,16 @@ exportButton.addEventListener('click', () => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initSliderAndDisplay(lumSlider, lumDisplay, 74);
+  initSliderAndDisplay(chromaSlider, chromaDisplay, 14);
+  initSliderAndDisplay(diffSlider, diffDisplay, 10);
+  refreshGrid();
 });
+
+resetButton.addEventListener('click', resetSlidersAndDisplays);
+exportButton.addEventListener('click', exportColors);
 
 refreshGrid();

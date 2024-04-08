@@ -16,9 +16,25 @@ body {
   overscroll-behavior: none;
 }
 
-input[type='number'],
 button {
-  padding: 4px 2px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 0;
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+input[type='number']:focus {
+  outline: none;
+  border: 1.5px solid rgba(0, 0, 0, 0.8) !important;
+}
+
+input[type='range']:focus {
+  outline: none;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.92));
+}
+
+input[type='range']:focus::-webkit-slider-thumb {
+  background-color: rgba(0, 0, 0, 0.92);
 }
 
 #colorGrid {
@@ -84,16 +100,26 @@ button {
 }
 
 .control input[type='number'] {
+  width: 32px;
   color: rgba(0, 0, 0, 0.5);
-  border: 1px solid #ccc;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
   border-radius: 2px;
-  padding: 8px 4px;
+  padding: 6px 2px;
+  text-align: center;
 }
 
 .control input[type='number']::-webkit-outer-spin-button,
 .control input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+#colorCount {
+  flex: 1 1 280px;
+  min-width: 280px;
+  @media (max-width: 968px) {
+    min-width: auto;
+  }
 }
 
 .info {
@@ -124,7 +150,7 @@ button {
 
 input[type='range'] {
   -webkit-appearance: none;
-  background: #dadada;
+  background: rgba(0, 0, 0, 0.1);
   height: 4px;
   border-radius: 50px;
   background-image: linear-gradient(#565656, #565656);
