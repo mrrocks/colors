@@ -7,7 +7,11 @@ const diffSlider = document.getElementById('diffInput');
 const diffDisplay = document.getElementById('diffValue');
 const chromaSlider = document.getElementById('chromaInput');
 const chromaDisplay = document.getElementById('chromaValue');
+const resetButton = document.getElementById('resetButton');
+const exportButton = document.getElementById('exportButton');
 const grid = document.getElementById('colorGrid');
+
+let palette = [];
 
 function textColor(bgColor) {
   const bgLum = sRGBtoY(chroma(bgColor).rgb());
@@ -63,7 +67,7 @@ function refreshGrid() {
   const chromaVal = parseFloat(chromaSlider.value) / 100;
   const diff = parseInt(diffSlider.value);
 
-  let palette = colorPalette(lum, chromaVal);
+  palette = colorPalette(lum, chromaVal); // Update the global palette variable
   palette = uniqueColors(palette, diff);
 
   grid.innerHTML = '';
@@ -73,39 +77,92 @@ function refreshGrid() {
   });
 
   updateCount(palette.length);
+
+  localStorage.setItem('lum', lumSlider.value);
+  localStorage.setItem('chroma', chromaSlider.value);
+  localStorage.setItem('diff', diffSlider.value);
 }
 
-// Range
+function initSliderAndDisplay(slider, display, defaultValue) {
+  const updateUI = (value) => {
+    slider.value = value;
+    display.value = value;
+    slider.style.backgroundSize =
+      ((value - slider.min) / (slider.max - slider.min)) * 100 + '% 100%';
+    refreshGrid();
+  };
 
-const initSliderBackground = (slider) => {
-  const min = slider.min;
-  const max = slider.max;
-  const currentVal = slider.value;
-  slider.style.backgroundSize =
-    ((currentVal - min) / (max - min)) * 100 + '% 100%';
-};
+  const storedValue = localStorage.getItem(slider.id) || defaultValue;
+  updateUI(storedValue);
 
-[lumSlider, diffSlider, chromaSlider].forEach((slider) => {
-  initSliderBackground(slider);
+  slider.addEventListener('input', () => {
+    localStorage.setItem(slider.id, slider.value);
+    updateUI(slider.value);
+  });
 
-  slider.addEventListener('input', () => initSliderBackground(slider));
-});
+  display.addEventListener('input', () => {
+    const value = display.value;
+    localStorage.setItem(slider.id, value);
+    updateUI(value);
+  });
+}
 
-// Event Listeners
-
-lumSlider.addEventListener('input', () => {
-  lumDisplay.textContent = lumSlider.value;
+document.addEventListener('DOMContentLoaded', () => {
+  initSliderAndDisplay(lumSlider, lumDisplay, 74);
+  initSliderAndDisplay(chromaSlider, chromaDisplay, 14);
+  initSliderAndDisplay(diffSlider, diffDisplay, 10);
   refreshGrid();
 });
 
-diffSlider.addEventListener('input', () => {
-  diffDisplay.textContent = diffSlider.value;
+resetButton.addEventListener('click', () => {
+  const defaultValues = {
+    lumInput: 74,
+    chromaInput: 14,
+    diffInput: 10,
+  };
+
+  Object.entries(defaultValues).forEach(([id, defaultValue]) => {
+    const slider = document.getElementById(id);
+    const display = document.getElementById(id.replace('Input', 'Value'));
+
+    slider.value = defaultValue;
+    display.value = defaultValue;
+    localStorage.setItem(id, defaultValue);
+
+    slider.style.backgroundSize =
+      ((defaultValue - slider.min) / (slider.max - slider.min)) * 100 +
+      '% 100%';
+  });
+
   refreshGrid();
 });
 
-chromaSlider.addEventListener('input', () => {
-  chromaDisplay.textContent = chromaSlider.value;
-  refreshGrid();
+exportButton.addEventListener('click', () => {
+  const format = document.getElementById('colorFormat').value;
+  let colorText = palette
+    .map((color) => {
+      switch (format) {
+        case 'hex':
+          return color.hex();
+        case 'rgb':
+          return `rgb(${color.rgb().join(', ')})`;
+        case 'oklch': {
+          const [l, c, h] = color.oklch();
+          return `oklch(${l} ${c} ${h})`;
+        }
+        default:
+          return '';
+      }
+    })
+    .join('\n');
+
+  const blob = new Blob([colorText], { type: 'text/plain' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'colors.txt';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 });
 
 refreshGrid();
