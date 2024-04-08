@@ -97,7 +97,7 @@ function colorBlock(color, nextColor, firstColor) {
   const deltaSpan = document.createElement('span');
   deltaSpan.className = 'deltas';
   deltaSpan.innerHTML = deltaNext;
-  deltaSpan.title = 'Relative color difference in %';
+  deltaSpan.title = 'Relative color difference against next color';
 
   block.appendChild(document.createTextNode(color.hex()));
   block.appendChild(deltaSpan);
