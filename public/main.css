@@ -114,12 +114,8 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .control input[type='range'] {
-  flex: 1 1 280px;
-  min-width: 280px;
+  flex: 1 1 auto;
   color: rgba(0, 0, 0, 0.5);
-  @media (max-width: 968px) {
-    min-width: auto;
-  }
 }
 
 .control input[type='number'],
