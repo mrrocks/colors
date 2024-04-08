@@ -1,15 +1,17 @@
 import chroma from 'chroma-js';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
+import blinder from 'color-blind';
 
 const lumSlider = document.getElementById('lumInput');
-const lumDisplay = document.getElementById('lumValue');
 const diffSlider = document.getElementById('diffInput');
-const diffDisplay = document.getElementById('diffValue');
 const chromaSlider = document.getElementById('chromaInput');
-const chromaDisplay = document.getElementById('chromaValue');
 const resetButton = document.getElementById('resetButton');
 const exportButton = document.getElementById('exportButton');
 const grid = document.getElementById('colorGrid');
+
+document
+  .getElementById('colorBlindMode')
+  .addEventListener('change', refreshGrid);
 
 let palette = [];
 
@@ -30,6 +32,10 @@ function textColor(bgColor) {
     : 'rgba(0, 0, 0, 0.92)';
 }
 
+document
+  .getElementById('colorBlindMode')
+  .addEventListener('change', refreshGrid);
+
 function colorPalette(lum, chromaVal) {
   let colors = [];
   const startHue = 12;
@@ -38,19 +44,37 @@ function colorPalette(lum, chromaVal) {
 
   for (let i = 0; i < quantity; i++) {
     const hue = startHue + (i / quantity) * (endHue - startHue);
-    colors.push(chroma.oklch(lum, chromaVal, hue));
+    let color = chroma.oklch(lum, chromaVal, hue).hex();
+    colors.push(chroma(color));
   }
   return colors;
 }
 
 function uniqueColors(colors, minDist) {
   const unique = [];
+  const isColorBlindMode = document.getElementById('colorBlindMode').checked;
+
   colors.forEach((color) => {
-    const isUnique = unique.every(
-      (uc) => chroma.distance(color, uc) >= minDist,
-    );
+    const isUnique = unique.every((uc) => {
+      // Calculate distance in normal mode
+      let distance = chroma.distance(color, uc);
+
+      // If color-blind mode is enabled, adjust the distance calculation
+      if (isColorBlindMode) {
+        const colorDeuteranomaly = chroma(blinder.deuteranomaly(color.hex()));
+        const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex()));
+        distance = Math.min(
+          distance,
+          chroma.distance(colorDeuteranomaly, ucDeuteranomaly),
+        );
+      }
+
+      return distance >= minDist;
+    });
+
     if (isUnique) unique.push(color);
   });
+
   return unique;
 }
 
