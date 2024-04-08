@@ -57,10 +57,8 @@ function uniqueColors(colors, minDist) {
 
   colors.forEach((color) => {
     const isUnique = unique.every((uc) => {
-      // Calculate distance using CIEDE2000 in normal mode
       let distance = differenceCiede2000(color.hex(), uc.hex());
 
-      // If color-blind mode is enabled, adjust the distance calculation
       if (isColorBlindMode) {
         const colorDeuteranomaly = chroma(
           blinder.deuteranomaly(color.hex()),
