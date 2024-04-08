@@ -1,6 +1,7 @@
 import chroma from 'chroma-js';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import blinder from 'color-blind';
+import { differenceCiede2000 } from 'd3-color-difference';
 
 const lumSlider = document.getElementById('lumInput');
 const diffSlider = document.getElementById('diffInput');
@@ -56,17 +57,20 @@ function uniqueColors(colors, minDist) {
 
   colors.forEach((color) => {
     const isUnique = unique.every((uc) => {
-      // Calculate distance in normal mode
-      let distance = chroma.distance(color, uc);
+      // Calculate distance using CIEDE2000 in normal mode
+      let distance = differenceCiede2000(color.hex(), uc.hex());
 
       // If color-blind mode is enabled, adjust the distance calculation
       if (isColorBlindMode) {
-        const colorDeuteranomaly = chroma(blinder.deuteranomaly(color.hex()));
-        const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex()));
-        distance = Math.min(
-          distance,
-          chroma.distance(colorDeuteranomaly, ucDeuteranomaly),
+        const colorDeuteranomaly = chroma(
+          blinder.deuteranomaly(color.hex()),
+        ).hex();
+        const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex())).hex();
+        const distanceDeuteranomaly = differenceCiede2000(
+          colorDeuteranomaly,
+          ucDeuteranomaly,
         );
+        distance = Math.min(distance, distanceDeuteranomaly);
       }
 
       return distance >= minDist;
