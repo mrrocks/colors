@@ -74,6 +74,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   opacity: 0.6;
   white-space: nowrap;
   margin-left: 12px;
+  cursor: help;
 }
 
 .header {
