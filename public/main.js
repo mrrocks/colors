@@ -95,25 +95,35 @@ function updateCount(length) {
 }
 
 function refreshGrid() {
-  const lum = parseFloat(lumSlider.value) / 100;
-  const chromaVal = parseFloat(chromaSlider.value) / 100;
-  const diff = parseInt(diffSlider.value);
+  requestAnimationFrame(() => {
+    const lum = parseFloat(lumSlider.value) / 100;
+    const chromaVal = parseFloat(chromaSlider.value) / 100;
+    const diff = parseInt(diffSlider.value);
 
-  palette = colorPalette(lum, chromaVal);
-  palette = uniqueColors(palette, diff);
+    const newPalette = colorPalette(lum, chromaVal);
+    const uniqueNewPalette = uniqueColors(newPalette, diff);
 
-  grid.innerHTML = '';
-  palette.forEach((color) => {
-    const block = colorBlock(color);
-    grid.appendChild(block);
+    if (
+      palette.length !== uniqueNewPalette.length ||
+      !palette.every(
+        (val, index) => val.hex() === uniqueNewPalette[index].hex(),
+      )
+    ) {
+      palette = uniqueNewPalette;
+      grid.innerHTML = '';
+      palette.forEach((color) => {
+        const block = colorBlock(color);
+        grid.appendChild(block);
+      });
+    }
+
+    updateCount(palette.length);
+    localStorage.setItem('lum', lumSlider.value);
+    localStorage.setItem('chroma', chromaSlider.value);
+    localStorage.setItem('diff', diffSlider.value);
+
+    updateURLParameters();
   });
-
-  updateCount(palette.length);
-  localStorage.setItem('lum', lumSlider.value);
-  localStorage.setItem('chroma', chromaSlider.value);
-  localStorage.setItem('diff', diffSlider.value);
-
-  updateURLParameters();
 }
 
 function updateURLParameters() {
