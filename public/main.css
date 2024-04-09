@@ -86,6 +86,7 @@ select {
   border-radius: 2px;
   padding: 0 4px;
   appearance: none;
+  background-color: transparent;
   background-image: url('data:image/svg+xml;utf8,<svg width="8" height="5" viewBox="0 0 8 5" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.198481 0.241353C0.479401 -0.0630428 0.953894 -0.0820729 1.25829 0.198847L4.00028 2.72938L6.74166 0.198898C7.04603 -0.0820529 7.52052 -0.0630703 7.80148 0.241297C8.08243 0.545664 8.06344 1.02016 7.75908 1.30111L4.50904 4.30111C4.22176 4.56628 3.77898 4.5663 3.49168 4.30116L0.240986 1.30116C-0.0634093 1.02024 -0.0824396 0.545748 0.198481 0.241353Z" fill="rgba(0,0,0,0.6)"/></svg>');
   background-size: 8px 5px;
   background-repeat: no-repeat;
