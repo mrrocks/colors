@@ -85,7 +85,7 @@ function colorBlock(color, nextColor, firstColor) {
       colorText = color.hex();
       break;
     case 'rgb':
-      colorText = color.rgb();
+      colorText = color.rgb().join(', ');
       break;
     case 'oklch':
       colorText = `${l}, ${c}, ${h}`;
