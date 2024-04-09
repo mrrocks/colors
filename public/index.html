@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
@@ -17,6 +17,20 @@
   <body>
     <div class="header">
       <div class="controls">
+        <div class="control title">
+          <label>Colors (<span id="colorCount">0</span>)</label>
+          <div class="options">
+            <div class="export">
+              <select id="colorFormat">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="oklch">OKLCH</option>
+              </select>
+              <button id="exportButton">Export</button>
+            </div>
+            <button id="resetButton">Reset</button>
+          </div>
+        </div>
         <div class="control">
           <label for="lumInput">Luminosity</label>
           <input
@@ -75,24 +89,18 @@
           />
         </div>
 
-        <div class="control">
-          <label>Colors (<span id="colorCount">0</span>)</label>
-          <div class="options">
-            <div class="export">
-              <select id="colorFormat">
-                <option value="hex">HEX</option>
-                <option value="rgb">RGB</option>
-                <option value="oklch">OKLCH</option>
-              </select>
-              <button id="exportButton">Export</button>
-            </div>
-            <button id="resetButton">Reset</button>
-          </div>
-        </div>
         <div class="control color-blind">
           <label
-            ><input type="checkbox" id="colorBlindMode" /> Deuteranomaly mode
-            (filters out indistinguishable colors)</label
+            ><input type="checkbox" id="colorBlindMode" />
+            <span
+              >Color blind mode (filters out
+              <a
+                href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/"
+                target="_blank"
+                >Deuteranomaly</a
+              >
+              close colors)</span
+            ></label
           >
         </div>
       </div>
@@ -101,7 +109,6 @@
         <a
           href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch"
           target="_blank"
-          rel="noopener noreferrer"
           >OKLCH color format</a
         >
         to generate and manipulate a perceptually uniform full-spectrum color
@@ -109,33 +116,29 @@
         changes in perceived luminosity and contrast. It supports a wider color
         gamut for accurate representation on modern displays and uses APAC to
         check contrast ratios. Additionally, it employs the CIEDE2000 formula to
-        scientifically calculate color differences. Learn more about OKLCH's
+        scientifically calculate color difference. Learn more about OKLCH's
         benefits
         <a
           class="number"
           href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
           target="_blank"
-          rel="noopener noreferrer"
           >[1]</a
         >,
         <a
           class="number"
           href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl"
           target="_blank"
-          rel="noopener noreferrer"
           >[2]</a
         >,
         <a
           class="number"
           href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/"
           target="_blank"
-          rel="noopener noreferrer"
           >[3]</a
         >, and APAC's advantages
         <a
           href="https://ruitina.com/apca-accessible-colour-contrast/"
           target="_blank"
-          rel="noopener noreferrer"
           >here</a
         >.
       </div>
