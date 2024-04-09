@@ -165,6 +165,14 @@ function saveSettings() {
   localStorage.setItem('lum', lumSlider.value);
   localStorage.setItem('chroma', chromaSlider.value);
   localStorage.setItem('diff', diffSlider.value);
+  localStorage.setItem(
+    'colorBlindMode',
+    document.getElementById('colorBlindMode').checked,
+  );
+  localStorage.setItem(
+    'colorFormat',
+    document.getElementById('colorFormat').value,
+  );
 }
 
 function updateURLParameters() {
@@ -172,6 +180,11 @@ function updateURLParameters() {
   queryParams.set('L', lumSlider.value);
   queryParams.set('C', chromaSlider.value);
   queryParams.set('D', diffSlider.value);
+  queryParams.set(
+    'CB',
+    document.getElementById('colorBlindMode').checked ? '1' : '0',
+  );
+  queryParams.set('F', document.getElementById('colorFormat').value);
   history.replaceState(null, null, '?' + queryParams.toString());
 }
 
@@ -265,6 +278,16 @@ function init() {
     const display = document.getElementById(`${id.replace('Input', 'Value')}`);
     initSliderAndDisplay(slider, display, value.toString());
   });
+
+  const colorBlindModeCheckbox = document.getElementById('colorBlindMode');
+  const colorBlindMode = localStorage.getItem('colorBlindMode') === 'true';
+  colorBlindModeCheckbox.checked = colorBlindMode;
+
+  const colorFormatSelect = document.getElementById('colorFormat');
+  const colorFormat = localStorage.getItem('colorFormat') || 'hex';
+  colorFormatSelect.value = colorFormat;
+
+  refreshGrid();
 }
 
 init();
