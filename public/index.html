@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
@@ -17,6 +17,20 @@
   <body>
     <div class="header">
       <div class="controls">
+        <div class="control title">
+          <label>Colors (<span id="colorCount">0</span>)</label>
+          <div class="options">
+            <div class="export">
+              <select id="colorFormat">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="oklch">OKLCH</option>
+              </select>
+              <button id="exportButton">Export</button>
+            </div>
+            <button id="resetButton">Reset</button>
+          </div>
+        </div>
         <div class="control">
           <label for="lumInput">Luminosity</label>
           <input
@@ -75,24 +89,11 @@
           />
         </div>
 
-        <div class="control">
-          <label>Colors (<span id="colorCount">0</span>)</label>
-          <div class="options">
-            <div class="export">
-              <select id="colorFormat">
-                <option value="hex">HEX</option>
-                <option value="rgb">RGB</option>
-                <option value="oklch">OKLCH</option>
-              </select>
-              <button id="exportButton">Export</button>
-            </div>
-            <button id="resetButton">Reset</button>
-          </div>
-        </div>
         <div class="control color-blind">
           <label
-            ><input type="checkbox" id="colorBlindMode" /> Deuteranomaly mode
-            (filters out indistinguishable colors)</label
+            ><input type="checkbox" id="colorBlindMode" /> Color blindness mode
+            (filters out indistinguishable colors for people with
+            Deuteranomaly)</label
           >
         </div>
       </div>
