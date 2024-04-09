@@ -44,14 +44,15 @@ input[type='checkbox'] {
 input[type='checkbox']::before {
   content: '';
   width: 10px;
-  height: 10px;
-  transform: scale(0);
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-  background-color: rgba(0, 0, 0, 0.8);
+  height: 8px;
+  opacity: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.74934 0.190402C10.0584 0.46618 10.0854 0.940286 9.80961 1.24935L4.00961 7.74935C3.87558 7.89955 3.6868 7.98957 3.48572 7.99916C3.28465 8.00874 3.08816 7.9371 2.94045 7.80033L0.240447 5.30033C-0.0634862 5.01891 -0.0817371 4.54438 0.199683 4.24045C0.481103 3.93652 0.955626 3.91827 1.25956 4.19969L3.39902 6.18066L8.6904 0.250667C8.96618 -0.058395 9.44028 -0.0853767 9.74934 0.190402Z" fill="rgba(0,0,0,0.8)"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 input[type='checkbox']:checked::before {
-  transform: scale(1);
+  opacity: 1;
 }
 
 select {
@@ -73,10 +74,10 @@ input[type='range']:focus::-webkit-slider-thumb {
 
 #colorGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 172px), 1fr));
   gap: 2px;
   overflow: auto;
-  flex: 1 1 70%;
+  flex: 1 1 60%;
 }
 
 #colorGrid div {
@@ -90,6 +91,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   font-size: 14px;
   gap: 8px;
   padding: 12px;
+  text-align: center;
 }
 
 .deltas {
@@ -101,7 +103,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .header {
-  flex: 1 1 30%;
+  flex: 1 1 40%;
   padding: 32px;
   display: flex;
   flex-direction: column;
@@ -138,13 +140,12 @@ input[type='range']:focus::-webkit-slider-thumb {
 
 .control label {
   flex: 0 1 140px;
-  min-width: 140px;
   white-space: nowrap;
   font-weight: 500;
 }
 
 .control input[type='range'] {
-  flex: 1 1 auto;
+  flex: 1 1;
   color: rgba(0, 0, 0, 0.5);
 }
 
@@ -173,6 +174,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 .control.title {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding-bottom: 16px;
+  margin-bottom: 4px;
 }
 
 .control.title label {
@@ -197,16 +199,20 @@ input[type='range']:focus::-webkit-slider-thumb {
 .color-blind {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 16px;
+  margin-top: 4px;
 }
 
 .color-blind label {
   font-size: 12px;
+  line-height: 20px;
   color: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: row;
   gap: 8px;
-  align-items: center;
+  align-items: start;
   cursor: pointer;
+  white-space: normal;
+  flex: 1 1 100%;
 }
 
 .info a {
