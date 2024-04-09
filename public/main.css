@@ -126,6 +126,15 @@ input[type='range']:focus::-webkit-slider-thumb {
   justify-content: space-between;
   line-height: 24px;
   height: 100%;
+  @media (max-width: 800px) {
+    gap: 16px;
+  }
+}
+
+#exportButton {
+  @media (max-width: 800px) {
+    display: none;
+  }
 }
 
 .info {
@@ -138,6 +147,10 @@ input[type='range']:focus::-webkit-slider-thumb {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 360px;
+  @media (max-width: 800px) {
+    min-width: auto;
+  }
 }
 
 .control {
@@ -156,7 +169,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .control input[type='range'] {
-  flex: 1 1;
+  flex: 1 1 auto;
   color: rgba(0, 0, 0, 0.5);
 }
 
@@ -203,7 +216,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .export select {
-  flex: 1 1 100%;
+  flex: 1 1 auto;
   height: 28px;
 }
 
