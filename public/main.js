@@ -15,6 +15,8 @@ const defaultValues = {
   lumInput: 74,
   chromaInput: 14,
   diffInput: 10,
+  colorBlindMode: false,
+  colorFormat: 'hex',
 };
 
 function textColor(bgColor) {
@@ -182,7 +184,7 @@ function updateURLParameters() {
   queryParams.set('D', diffSlider.value);
   queryParams.set(
     'CB',
-    document.getElementById('colorBlindMode').checked ? '1' : '0',
+    document.getElementById('colorBlindMode').checked ? 'ON' : 'OFF',
   );
   queryParams.set('F', document.getElementById('colorFormat').value);
   history.replaceState(null, null, '?' + queryParams.toString());
@@ -219,13 +221,22 @@ function initSliderAndDisplay(slider, display, defaultValue) {
 
 function resetSlidersAndDisplays() {
   Object.entries(defaultValues).forEach(([id, defaultValue]) => {
-    const slider = document.getElementById(id);
-    const display = document.getElementById(id.replace('Input', 'Value'));
-
-    slider.value = defaultValue;
-    display.value = defaultValue;
-    localStorage.setItem(id, defaultValue);
-    updateSliderBackground(slider, defaultValue);
+    if (id === 'colorBlindMode' || id === 'colorFormat') {
+      const element = document.getElementById(id);
+      if (id === 'colorBlindMode') {
+        element.checked = defaultValue;
+      } else {
+        element.value = defaultValue;
+      }
+      localStorage.setItem(id, defaultValue);
+    } else {
+      const slider = document.getElementById(id);
+      const display = document.getElementById(id.replace('Input', 'Value'));
+      slider.value = defaultValue;
+      display.value = defaultValue;
+      localStorage.setItem(id, defaultValue);
+      updateSliderBackground(slider, defaultValue);
+    }
   });
 
   refreshGrid();
