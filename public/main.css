@@ -13,6 +13,22 @@ body {
   display: flex;
   flex-direction: row;
   overscroll-behavior: none;
+  @media (max-width: 800px) {
+    flex-direction: column;
+  }
+}
+
+a,
+a:link,
+a:visited {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 1);
 }
 
 button {
@@ -110,17 +126,12 @@ input[type='range']:focus::-webkit-slider-thumb {
   justify-content: space-between;
   line-height: 24px;
   height: 100%;
-  @media (max-width: 968px) {
-  }
 }
 
 .info {
   font-size: 12px;
   line-height: 20px;
   color: rgba(0, 0, 0, 0.6);
-  @media (max-width: 968px) {
-    font-size: 12px;
-  }
 }
 
 .controls {
@@ -139,7 +150,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .control label {
-  flex: 0 1 140px;
+  flex: 0 0 132px;
   white-space: nowrap;
   font-weight: 500;
 }
@@ -208,22 +219,11 @@ input[type='range']:focus::-webkit-slider-thumb {
   color: rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: row;
-  gap: 8px;
   align-items: start;
   cursor: pointer;
   white-space: normal;
   flex: 1 1 100%;
-}
-
-.info a {
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.7);
-  text-decoration: none;
-}
-
-.info a:hover {
-  text-decoration: none;
-  color: rgba(0, 0, 0, 1);
+  gap: 8px;
 }
 
 .info .number {
