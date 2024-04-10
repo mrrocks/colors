@@ -32,23 +32,25 @@ function textColor(bgColor) {
     : 'rgba(0, 0, 0, 0.92)';
 }
 
-function generatePalette(lum, chromaVal, minDist) {
-  let colors = [];
-  const startHue = 0;
-  const endHue = 360;
-  const quantity = endHue - startHue;
-  const p3ModeEnabled = document.getElementById('p3Mode').checked;
-  const isColorBlindMode = document.getElementById('colorBlindMode').checked;
+function generatePalette(luminance, chromaValue, minimumDistance) {
   const uniqueColors = [];
+  const p3ModeEnabled = document.getElementById('p3Mode').checked;
+  const colorBlindModeEnabled =
+    document.getElementById('colorBlindMode').checked;
 
-  for (let i = 0; i < quantity; i++) {
-    const hue = startHue + (i / quantity) * (endHue - startHue);
-    let color = chroma.oklch(lum, chromaVal, hue);
-    let colorjsColor = new Color(`oklch(${lum} ${chromaVal} ${hue})`);
+  for (let hue = 0; hue < 360; hue++) {
+    let color = chroma.oklch(luminance, chromaValue, hue);
+    let colorJS = new Color(`oklch(${luminance} ${chromaValue} ${hue})`);
 
     if (
-      (!p3ModeEnabled || colorjsColor.inGamut('p3')) &&
-      isColorUnique(color, uniqueColors, minDist, isColorBlindMode)
+      isColorToAdd(
+        color,
+        colorJS,
+        uniqueColors,
+        minimumDistance,
+        colorBlindModeEnabled,
+        p3ModeEnabled,
+      )
     ) {
       uniqueColors.push(color);
     }
@@ -56,24 +58,48 @@ function generatePalette(lum, chromaVal, minDist) {
   return uniqueColors;
 }
 
-function isColorUnique(color, uniqueColors, minDist, isColorBlindMode) {
+function isColorToAdd(
+  color,
+  colorJS,
+  uniqueColors,
+  minimumDistance,
+  colorBlindModeEnabled,
+  p3ModeEnabled,
+) {
+  return (
+    (!p3ModeEnabled || isWithinP3Gamut(colorJS)) &&
+    isDistinctColor(color, uniqueColors, minimumDistance, colorBlindModeEnabled)
+  );
+}
+
+function isWithinP3Gamut(colorJS) {
+  return colorJS.inGamut('p3');
+}
+
+function isDistinctColor(
+  color,
+  uniqueColors,
+  minimumDistance,
+  colorBlindModeEnabled,
+) {
   return uniqueColors.every((uc) => {
     let distance = chroma.deltaE(color.hex(), uc.hex());
-
-    if (isColorBlindMode) {
-      const colorDeuteranomaly = chroma(
-        blinder.deuteranomaly(color.hex()),
-      ).hex();
-      const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex())).hex();
-      const distanceDeuteranomaly = chroma.deltaE(
-        colorDeuteranomaly,
-        ucDeuteranomaly,
+    if (colorBlindModeEnabled) {
+      distance = Math.min(
+        distance,
+        getAdjustedDistanceForColorBlindness(color, uc),
       );
-      distance = Math.min(distance, distanceDeuteranomaly);
     }
-
-    return distance >= minDist;
+    return distance >= minimumDistance;
   });
+}
+
+function getAdjustedDistanceForColorBlindness(color, comparisonColor) {
+  const colorDeuteranomaly = chroma(blinder.deuteranomaly(color.hex())).hex();
+  const comparisonColorDeuteranomaly = chroma(
+    blinder.deuteranomaly(comparisonColor.hex()),
+  ).hex();
+  return chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly);
 }
 
 function colorBlock(color, nextColor, firstColor) {
@@ -299,7 +325,7 @@ function init() {
   const colorFormat = localStorage.getItem('colorFormat') || 'hex';
   colorFormatSelect.value = colorFormat;
 
-  const p3ModeCheckbox = document.getElementById('p3Mode'); // Initialize P3 mode from local storage
+  const p3ModeCheckbox = document.getElementById('p3Mode');
   const p3Mode = localStorage.getItem('p3Mode') === 'true';
   p3ModeCheckbox.checked = p3Mode;
 
