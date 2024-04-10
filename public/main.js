@@ -19,8 +19,8 @@ const colorFormatSelect = document.getElementById('colorFormat');
 let palette = [];
 
 const defaultValues = {
-  lumInput: 74,
-  chromaInput: 16,
+  lumInput: 78,
+  chromaInput: 14,
   diffInput: 10,
   colorBlindMode: false,
   colorFormat: 'hex',
