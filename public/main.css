@@ -13,18 +13,18 @@
   padding: 0;
   font-family: Inter, sans-serif;
 }
-
 html,
 body {
-  color: var(--black-dark);
-  height: 100%;
-  margin: 0;
+  height: 100dvh;
+  width: 100vw;
+  overscroll-behavior: none;
+}
+
+body {
   display: flex;
   flex-direction: row;
-  overscroll-behavior: none;
-  @media (max-width: 800px) {
-    flex-direction: column;
-  }
+  min-height: 0;
+  color: var(--black-dark);
 }
 
 a,
@@ -102,12 +102,26 @@ input[type='range']:focus::-webkit-slider-thumb {
   background-color: var(--black-x-dark);
 }
 
+.header {
+  flex: 1 1 40vw;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  line-height: 24px;
+  height: 100dvh;
+  gap: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 424px;
+}
+
 #colorGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 172px), 1fr));
   gap: 2px;
   overflow: auto;
-  flex: 1 1 60%;
+  flex: 1 1 60vw;
 }
 
 #colorGrid div {
@@ -132,25 +146,6 @@ input[type='range']:focus::-webkit-slider-thumb {
   cursor: help;
 }
 
-.header {
-  flex: 1 1 40%;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  line-height: 24px;
-  height: 100%;
-  @media (max-width: 800px) {
-    gap: 16px;
-  }
-}
-
-#exportButton {
-  @media (max-width: 800px) {
-    display: none;
-  }
-}
-
 .info {
   font-size: 12px;
   line-height: 20px;
@@ -162,9 +157,6 @@ input[type='range']:focus::-webkit-slider-thumb {
   flex-direction: column;
   gap: 12px;
   min-width: 360px;
-  @media (max-width: 800px) {
-    min-width: auto;
-  }
 }
 
 .control {
@@ -245,12 +237,16 @@ input[type='range']:focus::-webkit-slider-thumb {
   line-height: 20px;
   color: var(--black-medium);
   display: flex;
+  width: 100%;
   flex-direction: row;
   align-items: start;
-  cursor: pointer;
-  white-space: normal;
-  flex: 1 1 100%;
   gap: 8px;
+}
+
+.color-blind label span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .info .number {
@@ -277,4 +273,30 @@ input[type='range']::-webkit-slider-thumb {
   background-color: #565656;
   border-radius: 50%;
   cursor: pointer;
+}
+
+/* Media queries */
+
+@media (max-width: 660px) {
+  :root {
+    --header-height: 272px;
+  }
+  body {
+    flex-direction: column;
+  }
+  .header {
+    flex: 1 1 auto;
+    height: var(--header-height);
+  }
+
+  #colorGrid {
+    flex-basis: calc(100dvh - var(--header-height));
+  }
+
+  .controls {
+    min-width: auto;
+  }
+  #exportButton {
+    display: none;
+  }
 }
