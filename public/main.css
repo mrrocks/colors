@@ -169,7 +169,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .control label {
-  flex: 0 0 132px;
+  flex: 0 0 128px;
   white-space: nowrap;
   font-weight: 500;
 }
