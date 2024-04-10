@@ -31,20 +31,30 @@ function updateCount(length) {
   colorCount.textContent = length;
 }
 
-export function refreshGrid() {
+export function refreshGrid(isReset = false) {
   requestAnimationFrame(() => {
-    const settings = {
-      lum: parseFloat(lumSlider.value) / 100,
-      chroma: parseFloat(chromaSlider.value) / 100,
-      diff: parseInt(diffSlider.value),
-      colorBlindMode: colorBlindModeCheckbox.checked,
-      p3Mode: p3ModeCheckbox.checked,
-      colorFormat: colorFormatSelect.value,
-    };
+    const settings = isReset
+      ? defaultValues
+      : {
+          lum: parseFloat(lumSlider.value) / 100,
+          chroma: parseFloat(chromaSlider.value) / 100,
+          diff: parseInt(diffSlider.value),
+          colorBlindMode: colorBlindModeCheckbox.checked,
+          p3Mode: p3ModeCheckbox.checked,
+          colorFormat: colorFormatSelect.value,
+        };
+
     updatePalette(settings);
     updateCount(palette.length);
     renderPalette(palette);
-    saveSettings(settings);
+    saveSettings({
+      lumInput: lumSlider.value,
+      chromaInput: chromaSlider.value,
+      diffInput: diffSlider.value,
+      colorBlindMode: colorBlindModeCheckbox.checked,
+      colorFormat: colorFormatSelect.value,
+      p3Mode: p3ModeCheckbox.checked,
+    });
     updateURLParameters({
       L: lumSlider.value,
       C: chromaSlider.value,
@@ -57,39 +67,60 @@ export function refreshGrid() {
 }
 
 function updatePalette(settings) {
+  const lum = settings.lum ?? defaultValues.lumInput / 100;
+  const chroma = settings.chroma ?? defaultValues.chromaInput / 100;
+  const diff = settings.diff ?? defaultValues.diffInput;
+
   const newPalette = generatePalette(
-    settings.lum,
-    settings.chroma,
-    settings.diff,
+    lum,
+    chroma,
+    diff,
     settings.colorBlindMode,
     settings.p3Mode,
   );
   palette = newPalette;
 }
 
+export function syncValues(slider, input, value) {
+  slider.value = value;
+  input.value = value;
+  updateSliderBackground(slider, value);
+}
+
 function syncSliderAndInput(slider, input, defaultValue) {
-  const syncValues = (value) => {
-    slider.value = input.value = value;
-    updateSliderBackground(slider, value);
-    localStorage.setItem(slider.id, value);
+  const storedValue = localStorage.getItem(slider.id) || defaultValue;
+  syncValues(slider, input, storedValue);
+
+  slider.oninput = () => {
+    syncValues(slider, input, slider.value);
     refreshGrid();
   };
-
-  const storedValue = localStorage.getItem(slider.id) || defaultValue;
-  syncValues(storedValue);
-
-  slider.oninput = () => syncValues(slider.value);
-  input.oninput = () => syncValues(input.value);
+  input.oninput = () => {
+    syncValues(slider, input, input.value);
+    refreshGrid();
+  };
 }
 
 function setupEventListeners() {
-  resetButton.addEventListener('click', () => resetControls(defaultValues));
+  resetButton.addEventListener('click', () =>
+    resetControls(
+      {
+        lumSlider: lumSlider,
+        chromaSlider: chromaSlider,
+        diffSlider: diffSlider,
+        colorBlindModeCheckbox: colorBlindModeCheckbox,
+        colorFormatSelect: colorFormatSelect,
+        p3ModeCheckbox: p3ModeCheckbox,
+      },
+      defaultValues,
+    ),
+  );
   exportButton.addEventListener('click', () =>
     exportColors(palette, colorFormatSelect.value),
   );
-  colorBlindModeCheckbox.addEventListener('change', refreshGrid);
-  colorFormatSelect.addEventListener('change', refreshGrid);
-  p3ModeCheckbox.addEventListener('change', refreshGrid);
+  colorBlindModeCheckbox.addEventListener('change', () => refreshGrid());
+  p3ModeCheckbox.addEventListener('change', () => refreshGrid());
+  colorFormatSelect.addEventListener('change', () => refreshGrid());
 }
 
 function init() {

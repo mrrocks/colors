@@ -4,8 +4,8 @@
   "description": "",
   "source": "public/index.html",
   "scripts": {
-    "start": "parcel",
-    "build": "parcel build"
+    "start": "parcel --no-cache",
+    "build": "parcel build --no-cache"
   },
   "license": "ISC",
   "devDependencies": {
