@@ -237,10 +237,10 @@ input[type='range']:focus::-webkit-slider-thumb {
   line-height: 20px;
   color: var(--black-medium);
   display: flex;
-  width: 100%;
   flex-direction: row;
   align-items: start;
   gap: 8px;
+  flex: 1 1 auto;
 }
 
 .color-blind label span {
@@ -287,6 +287,11 @@ input[type='range']::-webkit-slider-thumb {
   .header {
     flex: 1 1 auto;
     height: var(--header-height);
+    min-width: auto;
+  }
+
+  .color-blind label {
+    width: 100%;
   }
 
   #colorGrid {
