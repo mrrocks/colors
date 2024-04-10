@@ -1,6 +1,7 @@
 import chroma from 'chroma-js';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import blinder from 'color-blind';
+import Color from 'colorjs.io';
 
 const lumSlider = document.getElementById('lumInput');
 const diffSlider = document.getElementById('diffInput');
@@ -38,8 +39,12 @@ function colorPalette(lum, chromaVal) {
 
   for (let i = 0; i < quantity; i++) {
     const hue = startHue + (i / quantity) * (endHue - startHue);
-    let color = chroma.oklch(lum, chromaVal, hue).hex();
-    colors.push(chroma(color));
+    let color = chroma.oklch(lum, chromaVal, hue);
+    let colorjsColor = new Color(`oklch(${lum} ${chromaVal} ${hue})`);
+
+    if (colorjsColor.inGamut('p3')) {
+      colors.push(color);
+    }
   }
   return colors;
 }

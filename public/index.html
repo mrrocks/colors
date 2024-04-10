@@ -1,147 +1,81 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <script type="module" src="main.js"></script>
-    <link rel="stylesheet" href="main.css" />
-    <title>OKLCH – Color Generation</title>
-  </head>
 
-  <body>
-    <div class="header">
-      <div class="controls">
-        <div class="control title">
-          <label>Colors (<span id="colorCount">0</span>)</label>
-          <div class="options">
-            <div class="export">
-              <select id="colorFormat">
-                <option value="hex">HEX</option>
-                <option value="rgb">RGB</option>
-                <option value="oklch">OKLCH</option>
-              </select>
-              <button id="exportButton">Export</button>
-            </div>
-            <button id="resetButton">Reset</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" as="style"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <script type="module" src="main.js"></script>
+  <link rel="stylesheet" href="main.css" />
+  <title>OKLCH – Color Generation</title>
+</head>
+
+<body>
+  <div class="header">
+    <div class="controls">
+      <div class="control title">
+        <label>Colors (<span id="colorCount">0</span>)</label>
+        <div class="options">
+          <div class="export">
+            <select id="colorFormat">
+              <option value="hex">HEX</option>
+              <option value="rgb">RGB</option>
+              <option value="oklch">OKLCH</option>
+            </select>
+            <button id="exportButton">Export</button>
           </div>
-        </div>
-        <div class="control">
-          <label for="lumInput">Luminosity</label>
-          <input
-            type="range"
-            id="lumInput"
-            min="0"
-            max="100"
-            step="1"
-            value="74"
-          />
-          <input
-            type="number"
-            id="lumValue"
-            min="0"
-            max="100"
-            step="1"
-            value="74"
-          />
-        </div>
-        <div class="control">
-          <label for="chromaInput">Chroma (Vibrancy)</label>
-          <input
-            type="range"
-            id="chromaInput"
-            min="0"
-            max="36"
-            step="1"
-            value="14"
-          />
-          <input
-            type="number"
-            id="chromaValue"
-            min="0"
-            max="36"
-            step="1"
-            value="14"
-          />
-        </div>
-        <div class="control">
-          <label for="diffInput">Color Difference</label>
-          <input
-            type="range"
-            id="diffInput"
-            min="0"
-            max="20"
-            value="10"
-            step="1"
-          />
-          <input
-            type="number"
-            id="diffValue"
-            min="0"
-            max="20"
-            step="1"
-            value="10"
-          />
-        </div>
-
-        <div class="control color-blind">
-          <label
-            ><input type="checkbox" id="colorBlindMode" />
-            <span
-              >Color blind mode (filters out
-              <a
-                href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/"
-                target="_blank"
-                >Deuteranomaly</a
-              >
-              close colors)</span
-            ></label
-          >
+          <button id="resetButton">Reset</button>
         </div>
       </div>
-      <div class="info">
-        This tool uses the
-        <a
-          href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch"
-          target="_blank"
-          >OKLCH color format</a
-        >
-        to generate a perceptually uniform full-spectrum color palette, ensuring
-        that changes in color values correspond to equal changes in perceived
-        luminosity and contrast. It supports a wider color gamut for accurate
-        representation on modern displays and uses APAC to check contrast
-        ratios. Additionally, it employs the CIEDE2000 formula to scientifically
-        calculate color difference. Learn more about OKLCH's benefits
-        <a
-          class="number"
-          href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
-          target="_blank"
-          >[1]</a
-        >,
-        <a
-          class="number"
-          href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl"
-          target="_blank"
-          >[2]</a
-        >,
-        <a
-          class="number"
-          href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/"
-          target="_blank"
-          >[3]</a
-        >, and APAC's advantages
-        <a
-          href="https://ruitina.com/apca-accessible-colour-contrast/"
-          target="_blank"
-          >here</a
-        >.
+      <div class="control">
+        <label for="lumInput">Luminosity</label>
+        <input type="range" id="lumInput" min="0" max="100" step="1" value="74" />
+        <input type="number" id="lumValue" min="0" max="100" step="1" value="74" />
+      </div>
+      <div class="control">
+        <label for="chromaInput">Chroma (Vibrancy)</label>
+        <input type="range" id="chromaInput" min="0" max="36" step="1" value="14" />
+        <input type="number" id="chromaValue" min="0" max="36" step="1" value="14" />
+      </div>
+      <div class="control">
+        <label for="diffInput">Color Difference</label>
+        <input type="range" id="diffInput" min="0" max="20" value="10" step="1" />
+        <input type="number" id="diffValue" min="0" max="20" step="1" value="10" />
+      </div>
+
+      <div class="control color-blind">
+        <label><input type="checkbox" id="colorBlindMode" />
+          <span>Color blind mode (filters out
+            <a href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/"
+              target="_blank">Deuteranomaly</a>
+            close colors)</span></label>
+      </div>
+      <div class="control color-blind">
+        <label><input type="checkbox" id="p3Mode" />
+          <span>Remove colors outside of the P3 color space</span></label>
       </div>
     </div>
-    <div id="colorGrid"></div>
-  </body>
+    <div class="info">
+      This tool uses the
+      <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch" target="_blank">OKLCH color
+        format</a>
+      to generate a perceptually uniform full-spectrum color palette, ensuring
+      that changes in color values correspond to equal changes in perceived
+      luminosity and contrast. It supports a wider color gamut for accurate
+      representation on modern displays and uses APAC to check contrast
+      ratios. Additionally, it employs the CIEDE2000 formula to scientifically
+      calculate color difference. Learn more about OKLCH's benefits
+      <a class="number" href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
+        target="_blank">[1]</a>,
+      <a class="number" href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl"
+        target="_blank">[2]</a>,
+      <a class="number" href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/"
+        target="_blank">[3]</a>, and APAC's advantages
+      <a href="https://ruitina.com/apca-accessible-colour-contrast/" target="_blank">here</a>.
+    </div>
+  </div>
+  <div id="colorGrid"></div>
+</body>
+
 </html>
