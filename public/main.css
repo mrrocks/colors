@@ -25,6 +25,7 @@ body {
   flex-direction: row;
   min-height: 0;
   color: var(--black-dark);
+  overflow: hidden;
 }
 
 a,
@@ -110,7 +111,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   justify-content: space-between;
   line-height: 24px;
   height: 100dvh;
-  gap: 16px;
+  gap: 32px;
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 424px;
@@ -124,7 +125,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   flex: 1 1 60vw;
 }
 
-#colorGrid div {
+#colorGrid .color {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -136,6 +137,16 @@ input[type='range']:focus::-webkit-slider-thumb {
   gap: 8px;
   padding: 12px;
   text-align: center;
+}
+
+.error {
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--black-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .deltas {
@@ -162,16 +173,17 @@ input[type='range']:focus::-webkit-slider-thumb {
 .control {
   display: flex;
   flex-direction: row;
-  gap: 12px;
+  gap: 16px;
   font-size: 14px;
   align-items: center;
   user-select: none;
 }
 
 .control label {
-  flex: 0 0 128px;
+  flex: 0 0 70px;
   white-space: nowrap;
   font-weight: 500;
+  cursor: help;
 }
 
 .control input[type='range'] {
@@ -210,6 +222,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 .control.title label {
   font-size: 14px;
   font-weight: 600;
+  cursor: default;
 }
 
 .export {
@@ -228,22 +241,26 @@ input[type='range']:focus::-webkit-slider-thumb {
 
 .color-blind {
   border-top: 1px solid var(--black-x-light);
-  padding-top: 16px;
+  padding-top: 20px;
   margin-top: 4px;
 }
 
-.color-blind label {
+.color-blind label,
+.p3 label {
   font-size: 12px;
-  line-height: 20px;
+  line-height: 12px;
   color: var(--black-medium);
   display: flex;
   flex-direction: row;
-  align-items: start;
+  align-items: center;
   gap: 8px;
   flex: 1 1 auto;
+  cursor: default;
 }
 
-.color-blind label span {
+.color-blind label span,
+.p3 label span {
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -279,7 +296,7 @@ input[type='range']::-webkit-slider-thumb {
 
 @media (max-width: 660px) {
   :root {
-    --header-height: 272px;
+    --header-height: 316px;
   }
   body {
     flex-direction: column;
@@ -290,7 +307,8 @@ input[type='range']::-webkit-slider-thumb {
     min-width: auto;
   }
 
-  .color-blind label {
+  .color-blind label,
+  .p3 label {
     width: 100%;
   }
 

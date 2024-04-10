@@ -1,302 +1,152 @@
-import chroma from 'chroma-js';
-import { APCAcontrast, sRGBtoY } from 'apca-w3';
-import blinder from 'color-blind';
+import { generatePalette } from './paletteGenerator.js';
+import { renderPalette } from './colorGridRenderer.js';
+import { exportColors } from './exportColors.js';
+import { resetControls } from './resetControls.js';
+import { updateURLParameters } from './urlParamsManager.js';
+import { saveSettings } from './saveSettings.js';
+import { updateSliderBackground } from './utils.js';
 
+const colorCount = document.getElementById('colorCount');
 const lumSlider = document.getElementById('lumInput');
-const diffSlider = document.getElementById('diffInput');
 const chromaSlider = document.getElementById('chromaInput');
+const diffSlider = document.getElementById('diffInput');
 const resetButton = document.getElementById('resetButton');
 const exportButton = document.getElementById('exportButton');
-const grid = document.getElementById('colorGrid');
+const colorBlindModeCheckbox = document.getElementById('colorBlindMode');
+const p3ModeCheckbox = document.getElementById('p3Mode');
+const colorFormatSelect = document.getElementById('colorFormat');
 
 let palette = [];
 
 const defaultValues = {
-  lumInput: 74,
+  lumInput: 78,
   chromaInput: 14,
   diffInput: 10,
   colorBlindMode: false,
   colorFormat: 'hex',
+  p3Mode: false,
 };
 
-function textColor(bgColor) {
-  const bgLum = sRGBtoY(chroma(bgColor).rgb());
-  const whiteLum = sRGBtoY([255, 255, 255]);
-  const blackLum = sRGBtoY([0, 0, 0]);
-  const contrastWhite = APCAcontrast(whiteLum, bgLum);
-  const contrastBlack = APCAcontrast(blackLum, bgLum);
-  return Math.abs(contrastWhite) > Math.abs(contrastBlack)
-    ? 'rgba(255, 255, 255, 0.92)'
-    : 'rgba(0, 0, 0, 0.92)';
-}
-
-function colorPalette(lum, chromaVal) {
-  let colors = [];
-  const startHue = 0;
-  const endHue = 360;
-  const quantity = endHue - startHue;
-
-  for (let i = 0; i < quantity; i++) {
-    const hue = startHue + (i / quantity) * (endHue - startHue);
-    let color = chroma.oklch(lum, chromaVal, hue).hex();
-    colors.push(chroma(color));
-  }
-  return colors;
-}
-
-function uniqueColors(colors, minDist) {
-  const unique = [];
-  const isColorBlindMode = document.getElementById('colorBlindMode').checked;
-
-  colors.forEach((color) => {
-    const isUnique = unique.every((uc) => {
-      let distance = chroma.deltaE(color.hex(), uc.hex());
-
-      if (isColorBlindMode) {
-        const colorDeuteranomaly = chroma(
-          blinder.deuteranomaly(color.hex()),
-        ).hex();
-        const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex())).hex();
-        const distanceDeuteranomaly = chroma.deltaE(
-          colorDeuteranomaly,
-          ucDeuteranomaly,
-        );
-        distance = Math.min(distance, distanceDeuteranomaly);
-      }
-
-      return distance >= minDist;
-    });
-
-    if (isUnique) unique.push(color);
-  });
-
-  return unique;
-}
-
-function colorBlock(color, nextColor, firstColor) {
-  const block = document.createElement('div');
-  const [l, c, h] = color.oklch();
-  block.style.backgroundColor = `oklch(${l} ${c} ${h})`;
-
-  const format = document.getElementById('colorFormat').value;
-  let colorText;
-  switch (format) {
-    case 'hex':
-      colorText = color.hex();
-      break;
-    case 'rgb':
-      colorText = color.rgb().join(', ');
-      break;
-    case 'oklch':
-      colorText = `${l}, ${c}, ${h}`;
-      break;
-    default:
-      colorText = color.hex();
-  }
-  block.style.color = textColor(color.hex());
-
-  const formatDelta = (delta) =>
-    `${(Math.round(delta * 10) / 10).toFixed(1)}% ▸`;
-
-  const deltaNext = formatDelta(
-    nextColor
-      ? chroma.deltaE(color, nextColor)
-      : chroma.deltaE(color, firstColor),
-  );
-
-  const deltaSpan = document.createElement('span');
-  deltaSpan.className = 'deltas';
-  deltaSpan.innerHTML = deltaNext;
-  deltaSpan.title = 'Relative color difference against next color';
-
-  block.appendChild(document.createTextNode(colorText));
-  block.appendChild(deltaSpan);
-
-  return block;
-}
-
 function updateCount(length) {
-  const display = document.getElementById('colorCount');
-  display.textContent = length;
+  colorCount.textContent = length;
 }
 
-function refreshGrid() {
+export function refreshGrid(isReset = false) {
   requestAnimationFrame(() => {
-    updatePalette();
-    renderPalette();
+    const settings = isReset
+      ? defaultValues
+      : {
+          lum: parseFloat(lumSlider.value) / 100,
+          chroma: parseFloat(chromaSlider.value) / 100,
+          diff: parseInt(diffSlider.value),
+          colorBlindMode: colorBlindModeCheckbox.checked,
+          p3Mode: p3ModeCheckbox.checked,
+          colorFormat: colorFormatSelect.value,
+        };
+
+    updatePalette(settings);
     updateCount(palette.length);
-    saveSettings();
-    updateURLParameters();
-  });
-}
-
-function updatePalette() {
-  const lum = parseFloat(lumSlider.value) / 100;
-  const chromaVal = parseFloat(chromaSlider.value) / 100;
-  const diff = parseInt(diffSlider.value);
-
-  const newPalette = colorPalette(lum, chromaVal);
-  const uniqueNewPalette = uniqueColors(newPalette, diff);
-
-  if (paletteChanged(palette, uniqueNewPalette)) {
-    palette = uniqueNewPalette;
-  }
-}
-
-function paletteChanged(oldPalette, newPalette) {
-  return (
-    oldPalette.length !== newPalette.length ||
-    !oldPalette.every((val, index) => val.hex() === newPalette[index].hex())
-  );
-}
-
-function renderPalette() {
-  if (paletteChanged(palette, [])) {
-    grid.innerHTML = '';
-    const fragment = document.createDocumentFragment();
-    palette.forEach((color, index) => {
-      const nextColor = palette[index + 1] || palette[0];
-      const block = colorBlock(color, nextColor);
-      fragment.appendChild(block);
+    renderPalette(palette);
+    saveSettings({
+      lumInput: lumSlider.value,
+      chromaInput: chromaSlider.value,
+      diffInput: diffSlider.value,
+      colorBlindMode: colorBlindModeCheckbox.checked,
+      colorFormat: colorFormatSelect.value,
+      p3Mode: p3ModeCheckbox.checked,
     });
-    grid.appendChild(fragment);
-  }
+    updateURLParameters({
+      L: lumSlider.value,
+      C: chromaSlider.value,
+      D: diffSlider.value,
+      F: colorFormatSelect.value,
+      CB: settings.colorBlindMode ? 'ON' : 'OFF',
+      P3: settings.p3Mode ? 'ON' : 'OFF',
+    });
+  });
 }
 
-function saveSettings() {
-  localStorage.setItem('lum', lumSlider.value);
-  localStorage.setItem('chroma', chromaSlider.value);
-  localStorage.setItem('diff', diffSlider.value);
-  localStorage.setItem(
-    'colorBlindMode',
-    document.getElementById('colorBlindMode').checked,
+function updatePalette(settings) {
+  const lum = settings.lum ?? defaultValues.lumInput / 100;
+  const chroma = settings.chroma ?? defaultValues.chromaInput / 100;
+  const diff = settings.diff ?? defaultValues.diffInput;
+
+  const newPalette = generatePalette(
+    lum,
+    chroma,
+    diff,
+    settings.colorBlindMode,
+    settings.p3Mode,
   );
-  localStorage.setItem(
-    'colorFormat',
-    document.getElementById('colorFormat').value,
-  );
+  palette = newPalette;
 }
 
-function updateURLParameters() {
-  const queryParams = new URLSearchParams(window.location.search);
-  queryParams.set('L', lumSlider.value);
-  queryParams.set('C', chromaSlider.value);
-  queryParams.set('D', diffSlider.value);
-  queryParams.set(
-    'CB',
-    document.getElementById('colorBlindMode').checked ? 'ON' : 'OFF',
-  );
-  queryParams.set('F', document.getElementById('colorFormat').value);
-  history.replaceState(null, null, '?' + queryParams.toString());
-}
-
-function updateSliderBackground(slider, value) {
-  slider.style.backgroundSize = `${((value - slider.min) / (slider.max - slider.min)) * 100}% 100%`;
-}
-
-function updateUI(slider, display, value) {
+export function syncValues(slider, input, value) {
   slider.value = value;
-  display.value = value;
+  input.value = value;
   updateSliderBackground(slider, value);
-  refreshGrid();
-  updateURLParameters();
 }
 
-function initSliderAndDisplay(slider, display, defaultValue) {
-  const initialValue = localStorage.getItem(slider.id) || defaultValue;
-  updateUI(slider, display, initialValue);
+function syncSliderAndInput(slider, input, defaultValue) {
+  const storedValue = localStorage.getItem(slider.id) || defaultValue;
+  syncValues(slider, input, storedValue);
 
-  slider.addEventListener('input', () => {
-    localStorage.setItem(slider.id, slider.value);
-    updateUI(slider, display, slider.value);
+  slider.oninput = () => {
+    syncValues(slider, input, slider.value);
     refreshGrid();
-  });
-
-  display.addEventListener('input', () => {
-    localStorage.setItem(slider.id, display.value);
-    updateUI(slider, display, display.value);
+  };
+  input.oninput = () => {
+    syncValues(slider, input, input.value);
     refreshGrid();
-  });
-}
-
-function resetSlidersAndDisplays() {
-  Object.entries(defaultValues).forEach(([id, defaultValue]) => {
-    if (id === 'colorBlindMode' || id === 'colorFormat') {
-      const element = document.getElementById(id);
-      if (id === 'colorBlindMode') {
-        element.checked = defaultValue;
-      } else {
-        element.value = defaultValue;
-      }
-      localStorage.setItem(id, defaultValue);
-    } else {
-      const slider = document.getElementById(id);
-      const display = document.getElementById(id.replace('Input', 'Value'));
-      slider.value = defaultValue;
-      display.value = defaultValue;
-      localStorage.setItem(id, defaultValue);
-      updateSliderBackground(slider, defaultValue);
-    }
-  });
-
-  refreshGrid();
-}
-
-function exportColors() {
-  const format = document.getElementById('colorFormat').value;
-  let colorText = palette
-    .map((color) => {
-      switch (format) {
-        case 'hex':
-          return color.hex();
-        case 'rgb':
-          return `rgb(${color.rgb().join(', ')})`;
-        case 'oklch': {
-          const [l, c, h] = color.oklch();
-          return `oklch(${l} ${c} ${h})`;
-        }
-        default:
-          return '';
-      }
-    })
-    .join('\n');
-
-  const blob = new Blob([colorText], { type: 'text/plain' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'colors.txt';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  };
 }
 
 function setupEventListeners() {
-  resetButton.addEventListener('click', resetSlidersAndDisplays);
-  exportButton.addEventListener('click', exportColors);
-  document
-    .getElementById('colorBlindMode')
-    .addEventListener('change', refreshGrid);
-
-  document
-    .getElementById('colorFormat')
-    .addEventListener('change', refreshGrid);
+  resetButton.addEventListener('click', () =>
+    resetControls(
+      {
+        lumSlider: lumSlider,
+        chromaSlider: chromaSlider,
+        diffSlider: diffSlider,
+        colorBlindModeCheckbox: colorBlindModeCheckbox,
+        colorFormatSelect: colorFormatSelect,
+        p3ModeCheckbox: p3ModeCheckbox,
+      },
+      defaultValues,
+    ),
+  );
+  exportButton.addEventListener('click', () =>
+    exportColors(palette, colorFormatSelect.value),
+  );
+  colorBlindModeCheckbox.addEventListener('change', () => refreshGrid());
+  p3ModeCheckbox.addEventListener('change', () => refreshGrid());
+  colorFormatSelect.addEventListener('change', () => refreshGrid());
 }
 
 function init() {
   setupEventListeners();
-  Object.entries(defaultValues).forEach(([id, value]) => {
-    const slider = document.getElementById(id);
-    const display = document.getElementById(`${id.replace('Input', 'Value')}`);
-    initSliderAndDisplay(slider, display, value.toString());
-  });
 
-  const colorBlindModeCheckbox = document.getElementById('colorBlindMode');
-  const colorBlindMode = localStorage.getItem('colorBlindMode') === 'true';
-  colorBlindModeCheckbox.checked = colorBlindMode;
+  syncSliderAndInput(
+    lumSlider,
+    document.getElementById('lumValue'),
+    defaultValues.lumInput.toString(),
+  );
+  syncSliderAndInput(
+    chromaSlider,
+    document.getElementById('chromaValue'),
+    defaultValues.chromaInput.toString(),
+  );
+  syncSliderAndInput(
+    diffSlider,
+    document.getElementById('diffValue'),
+    defaultValues.diffInput.toString(),
+  );
 
-  const colorFormatSelect = document.getElementById('colorFormat');
-  const colorFormat = localStorage.getItem('colorFormat') || 'hex';
-  colorFormatSelect.value = colorFormat;
+  colorFormatSelect.value =
+    localStorage.getItem('colorFormat') || defaultValues.colorFormat;
+  colorBlindModeCheckbox.checked =
+    localStorage.getItem('colorBlindMode') === 'true';
+  p3ModeCheckbox.checked = localStorage.getItem('p3Mode') === 'true';
 
   refreshGrid();
 }
