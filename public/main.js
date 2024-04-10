@@ -20,7 +20,7 @@ let palette = [];
 
 const defaultValues = {
   lumInput: 74,
-  chromaInput: 14,
+  chromaInput: 16,
   diffInput: 10,
   colorBlindMode: false,
   colorFormat: 'hex',
