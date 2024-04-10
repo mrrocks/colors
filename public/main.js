@@ -18,6 +18,7 @@ const defaultValues = {
   diffInput: 10,
   colorBlindMode: false,
   colorFormat: 'hex',
+  p3Mode: false,
 };
 
 function textColor(bgColor) {
@@ -31,51 +32,48 @@ function textColor(bgColor) {
     : 'rgba(0, 0, 0, 0.92)';
 }
 
-function colorPalette(lum, chromaVal) {
+function generatePalette(lum, chromaVal, minDist) {
   let colors = [];
   const startHue = 0;
   const endHue = 360;
   const quantity = endHue - startHue;
+  const p3ModeEnabled = document.getElementById('p3Mode').checked;
+  const isColorBlindMode = document.getElementById('colorBlindMode').checked;
+  const uniqueColors = [];
 
   for (let i = 0; i < quantity; i++) {
     const hue = startHue + (i / quantity) * (endHue - startHue);
     let color = chroma.oklch(lum, chromaVal, hue);
     let colorjsColor = new Color(`oklch(${lum} ${chromaVal} ${hue})`);
 
-    if (colorjsColor.inGamut('p3')) {
-      colors.push(color);
+    if (
+      (!p3ModeEnabled || colorjsColor.inGamut('p3')) &&
+      isColorUnique(color, uniqueColors, minDist, isColorBlindMode)
+    ) {
+      uniqueColors.push(color);
     }
   }
-  return colors;
+  return uniqueColors;
 }
 
-function uniqueColors(colors, minDist) {
-  const unique = [];
-  const isColorBlindMode = document.getElementById('colorBlindMode').checked;
+function isColorUnique(color, uniqueColors, minDist, isColorBlindMode) {
+  return uniqueColors.every((uc) => {
+    let distance = chroma.deltaE(color.hex(), uc.hex());
 
-  colors.forEach((color) => {
-    const isUnique = unique.every((uc) => {
-      let distance = chroma.deltaE(color.hex(), uc.hex());
+    if (isColorBlindMode) {
+      const colorDeuteranomaly = chroma(
+        blinder.deuteranomaly(color.hex()),
+      ).hex();
+      const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex())).hex();
+      const distanceDeuteranomaly = chroma.deltaE(
+        colorDeuteranomaly,
+        ucDeuteranomaly,
+      );
+      distance = Math.min(distance, distanceDeuteranomaly);
+    }
 
-      if (isColorBlindMode) {
-        const colorDeuteranomaly = chroma(
-          blinder.deuteranomaly(color.hex()),
-        ).hex();
-        const ucDeuteranomaly = chroma(blinder.deuteranomaly(uc.hex())).hex();
-        const distanceDeuteranomaly = chroma.deltaE(
-          colorDeuteranomaly,
-          ucDeuteranomaly,
-        );
-        distance = Math.min(distance, distanceDeuteranomaly);
-      }
-
-      return distance >= minDist;
-    });
-
-    if (isUnique) unique.push(color);
+    return distance >= minDist;
   });
-
-  return unique;
 }
 
 function colorBlock(color, nextColor, firstColor) {
@@ -140,11 +138,10 @@ function updatePalette() {
   const chromaVal = parseFloat(chromaSlider.value) / 100;
   const diff = parseInt(diffSlider.value);
 
-  const newPalette = colorPalette(lum, chromaVal);
-  const uniqueNewPalette = uniqueColors(newPalette, diff);
+  const newPalette = generatePalette(lum, chromaVal, diff);
 
-  if (paletteChanged(palette, uniqueNewPalette)) {
-    palette = uniqueNewPalette;
+  if (paletteChanged(palette, newPalette)) {
+    palette = newPalette;
   }
 }
 
@@ -180,6 +177,7 @@ function saveSettings() {
     'colorFormat',
     document.getElementById('colorFormat').value,
   );
+  localStorage.setItem('p3Mode', document.getElementById('p3Mode').checked); // Save P3 mode
 }
 
 function updateURLParameters() {
@@ -192,6 +190,10 @@ function updateURLParameters() {
     document.getElementById('colorBlindMode').checked ? 'ON' : 'OFF',
   );
   queryParams.set('F', document.getElementById('colorFormat').value);
+  queryParams.set(
+    'P3',
+    document.getElementById('p3Mode').checked ? 'ON' : 'OFF',
+  );
   history.replaceState(null, null, '?' + queryParams.toString());
 }
 
@@ -226,24 +228,17 @@ function initSliderAndDisplay(slider, display, defaultValue) {
 
 function resetSlidersAndDisplays() {
   Object.entries(defaultValues).forEach(([id, defaultValue]) => {
-    if (id === 'colorBlindMode' || id === 'colorFormat') {
-      const element = document.getElementById(id);
-      if (id === 'colorBlindMode') {
-        element.checked = defaultValue;
-      } else {
-        element.value = defaultValue;
-      }
+    const element = document.getElementById(id);
+    if (['colorBlindMode', 'colorFormat', 'p3Mode'].includes(id)) {
+      element[id === 'colorFormat' ? 'value' : 'checked'] = defaultValue;
       localStorage.setItem(id, defaultValue);
     } else {
-      const slider = document.getElementById(id);
-      const display = document.getElementById(id.replace('Input', 'Value'));
-      slider.value = defaultValue;
-      display.value = defaultValue;
-      localStorage.setItem(id, defaultValue);
-      updateSliderBackground(slider, defaultValue);
+      const displayId = id.replace('Input', 'Value');
+      const display = document.getElementById(displayId);
+      updateUI(element, display, defaultValue);
     }
   });
-
+  saveSettings();
   refreshGrid();
 }
 
@@ -281,10 +276,11 @@ function setupEventListeners() {
   document
     .getElementById('colorBlindMode')
     .addEventListener('change', refreshGrid);
-
   document
     .getElementById('colorFormat')
     .addEventListener('change', refreshGrid);
+
+  document.getElementById('p3Mode').addEventListener('change', refreshGrid);
 }
 
 function init() {
@@ -302,6 +298,10 @@ function init() {
   const colorFormatSelect = document.getElementById('colorFormat');
   const colorFormat = localStorage.getItem('colorFormat') || 'hex';
   colorFormatSelect.value = colorFormat;
+
+  const p3ModeCheckbox = document.getElementById('p3Mode'); // Initialize P3 mode from local storage
+  const p3Mode = localStorage.getItem('p3Mode') === 'true';
+  p3ModeCheckbox.checked = p3Mode;
 
   refreshGrid();
 }
