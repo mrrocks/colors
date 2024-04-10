@@ -124,7 +124,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   flex: 1 1 60vw;
 }
 
-#colorGrid div {
+#colorGrid .color {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -136,6 +136,16 @@ input[type='range']:focus::-webkit-slider-thumb {
   gap: 8px;
   padding: 12px;
   text-align: center;
+}
+
+.error {
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--black-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .deltas {
