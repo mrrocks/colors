@@ -168,6 +168,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 424px;
+  max-width: 680px;
 }
 
 #colorGrid {
