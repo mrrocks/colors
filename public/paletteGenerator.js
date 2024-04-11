@@ -2,29 +2,60 @@ import chroma from 'chroma-js';
 import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
+import chroma from 'chroma-js';
+
 export function generatePalette(
   lightnessValue,
   chromaValue,
   minimumDistance,
   colorBlindModeEnabled,
   p3ModeEnabled,
+  inputColors = [], // New parameter for input colors
 ) {
   const uniqueColors = [];
   const colorBlindCache = {};
+  inputColors = [''];
 
-  for (let hue = 0; hue < 360; hue++) {
-    const color = { lightness: lightnessValue, chroma: chromaValue, hue };
-    if (
-      isColorToAdd(
-        color,
-        uniqueColors,
-        minimumDistance,
-        colorBlindModeEnabled,
-        p3ModeEnabled,
-        colorBlindCache,
-      )
-    ) {
-      uniqueColors.push(color);
+  if (inputColors.length > 0) {
+    // Process the list of input colors
+    inputColors.forEach((color, index) => {
+      if (index < inputColors.length - 1) {
+        const nextColor = inputColors[index + 1];
+        const scale = chroma.scale([color, nextColor]).mode('lch').colors(10);
+        scale.forEach((scaledColor) => {
+          const { l, c, h } = chroma(scaledColor).lch();
+          const interpolatedColor = { lightness: l, chroma: c, hue: h };
+          if (
+            isColorToAdd(
+              interpolatedColor,
+              uniqueColors,
+              minimumDistance,
+              colorBlindModeEnabled,
+              p3ModeEnabled,
+              colorBlindCache,
+            )
+          ) {
+            uniqueColors.push(interpolatedColor);
+          }
+        });
+      }
+    });
+  } else {
+    // Original full spectrum generation logic
+    for (let hue = 0; hue < 360; hue++) {
+      const color = { lightness: lightnessValue, chroma: chromaValue, hue };
+      if (
+        isColorToAdd(
+          color,
+          uniqueColors,
+          minimumDistance,
+          colorBlindModeEnabled,
+          p3ModeEnabled,
+          colorBlindCache,
+        )
+      ) {
+        uniqueColors.push(color);
+      }
     }
   }
   return uniqueColors;
