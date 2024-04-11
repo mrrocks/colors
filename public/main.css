@@ -221,7 +221,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .control label {
-  flex: 0 0 80px;
+  flex: 0 0 88px;
   white-space: nowrap;
   font-weight: 500;
   cursor: help;

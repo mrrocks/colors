@@ -10,19 +10,21 @@ export function generatePalette(
   p3ModeEnabled,
 ) {
   const uniqueColors = [];
+  const colorBlindCache = {};
 
   for (let hue = 0; hue < 360; hue++) {
     let color = chroma.oklch(lightnessValue, chromaValue, hue);
-    let colorJS = new Color(`oklch(${lightnessValue} ${chromaValue} ${hue})`);
-
     if (
       isColorToAdd(
         color,
-        colorJS,
+        lightnessValue,
+        chromaValue,
+        hue,
         uniqueColors,
         minimumDistance,
         colorBlindModeEnabled,
         p3ModeEnabled,
+        colorBlindCache,
       )
     ) {
       uniqueColors.push(color);
@@ -33,20 +35,27 @@ export function generatePalette(
 
 function isColorToAdd(
   color,
-  colorJS,
+  lightnessValue,
+  chromaValue,
+  hue,
   uniqueColors,
   minimumDistance,
   colorBlindModeEnabled,
   p3ModeEnabled,
+  colorBlindCache,
 ) {
-  return (
-    (!p3ModeEnabled || isWithinP3Gamut(colorJS)) &&
-    isDistinctColor(color, uniqueColors, minimumDistance, colorBlindModeEnabled)
+  let colorJS;
+  if (p3ModeEnabled) {
+    colorJS = new Color(`oklch(${lightnessValue} ${chromaValue} ${hue})`);
+    if (!colorJS.inGamut('p3')) return false;
+  }
+  return isDistinctColor(
+    color,
+    uniqueColors,
+    minimumDistance,
+    colorBlindModeEnabled,
+    colorBlindCache,
   );
-}
-
-function isWithinP3Gamut(colorJS) {
-  return colorJS.inGamut('p3');
 }
 
 function isDistinctColor(
@@ -54,23 +63,26 @@ function isDistinctColor(
   uniqueColors,
   minimumDistance,
   colorBlindModeEnabled,
+  colorBlindCache,
 ) {
   return uniqueColors.every((uc) => {
     let distance = chroma.deltaE(color.hex(), uc.hex());
     if (colorBlindModeEnabled) {
+      const colorHex = color.hex();
+      const ucHex = uc.hex();
+      const colorDeuteranomaly =
+        colorBlindCache[colorHex] ||
+        (colorBlindCache[colorHex] = chroma(
+          blinder.deuteranomaly(colorHex),
+        ).hex());
+      const comparisonColorDeuteranomaly =
+        colorBlindCache[ucHex] ||
+        (colorBlindCache[ucHex] = chroma(blinder.deuteranomaly(ucHex)).hex());
       distance = Math.min(
         distance,
-        getAdjustedDistanceForColorBlindness(color, uc),
+        chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly),
       );
     }
     return distance >= minimumDistance;
   });
-}
-
-function getAdjustedDistanceForColorBlindness(color, comparisonColor) {
-  const colorDeuteranomaly = chroma(blinder.deuteranomaly(color.hex())).hex();
-  const comparisonColorDeuteranomaly = chroma(
-    blinder.deuteranomaly(comparisonColor.hex()),
-  ).hex();
-  return chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly);
 }
