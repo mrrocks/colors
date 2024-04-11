@@ -59,12 +59,12 @@ export function refreshGrid(isReset = false) {
       p3Mode: p3ModeCheckbox.checked,
     });
     updateURLParameters({
-      L: lumSlider.value,
-      C: chromaSlider.value,
-      D: diffSlider.value,
-      F: colorFormatSelect.value,
-      CB: settings.colorBlindMode ? 'ON' : 'OFF',
-      P3: settings.p3Mode ? 'ON' : 'OFF',
+      lumInput: lumSlider.value.padStart(2, '0'),
+      chromaInput: chromaSlider.value.padStart(2, '0'),
+      diffInput: diffSlider.value.padStart(2, '0'),
+      colorBlindMode: colorBlindModeCheckbox.checked,
+      p3Mode: p3ModeCheckbox.checked,
+      colorFormat: colorFormatSelect.value,
     });
   });
 }
