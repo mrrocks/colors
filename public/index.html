@@ -1,90 +1,141 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <script type="module" src="main.js"></script>
+    <link rel="stylesheet" href="main.css" />
+    <title>OKLCH – Color Generation</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" as="style"
-    onload="this.onload=null;this.rel='stylesheet'" />
-  <script type="module" src="main.js"></script>
-  <link rel="stylesheet" href="main.css" />
-  <title>OKLCH – Color Generation</title>
-</head>
-
-<body>
-  <div class="header">
-    <div class="controls">
-      <div class="control title">
-        <label>Colors (<span id="colorCount">0</span>)</label>
-        <div class="options">
-          <div class="export">
-            <select id="colorFormat">
-              <option value="hex">HEX</option>
-              <option value="rgb">RGB</option>
-              <option value="oklch">OKLCH</option>
-            </select>
-            <button id="exportButton">Export</button>
+  <body>
+    <div class="header">
+      <div class="controls">
+        <div class="control title">
+          <label>Colors (<span id="colorCount">0</span>)</label>
+          <div class="options">
+            <div class="export">
+              <select id="colorFormat">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="oklch">OKLCH</option>
+              </select>
+              <button id="exportButton">Export</button>
+            </div>
+            <button id="resetButton">Reset</button>
           </div>
-          <button id="resetButton">Reset</button>
+        </div>
+        <div class="control">
+          <label
+            for="lumInput"
+            title="Lightness represents the perceived brightness of a color, ranging from 0% (pure black) to 100% (pure white), reflecting how light or dark a color appears"
+            >Lightness</label
+          >
+
+          <input type="range" id="lumInput" min="0" max="100" step="1" value="74" />
+          <input
+            type="number"
+            id="lumValue"
+            min="0"
+            max="100"
+            step="1"
+            value="74"
+            inputmode="numeric"
+          />
+        </div>
+        <div class="control">
+          <label
+            for="chromaInput"
+            title="Chroma measures the vividness or intensity of a color, from 0 (completely uncolored or gray) to a maximum that varies by hue but is generally around 0.37, indicating how pure or saturated a color is."
+            >Chroma</label
+          >
+
+          <input type="range" id="chromaInput" min="0" max="36" step="1" value="14" />
+          <input
+            type="number"
+            id="chromaValue"
+            min="0"
+            max="36"
+            step="1"
+            value="14"
+            inputmode="numeric"
+          />
+        </div>
+        <div class="control">
+          <label
+            for="diffInput"
+            title="The difference calculation is done using the CIEDE2000 formula, which takes into account variations in hue, chroma, and lightness between two colors to calculate perceived differences as seen by the human eye."
+            >Difference</label
+          >
+          <input type="range" id="diffInput" min="0" max="20" value="10" step="1" />
+          <input
+            type="number"
+            id="diffValue"
+            min="0"
+            max="20"
+            step="1"
+            value="10"
+            inputmode="numeric"
+          />
+        </div>
+
+        <div class="control color-blind">
+          <label for="colorBlindMode">
+            <input type="checkbox" id="colorBlindMode" />
+            <span>
+              <b>Color Blind Mode</b> - Hide similar colors for
+              <a
+                href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/"
+                target="_blank"
+                >Deuteranomaly</a
+              ></span
+            >
+          </label>
+        </div>
+        <div class="control p3">
+          <label for="p3Mode">
+            <input type="checkbox" id="p3Mode" />
+            <span><b>P3 Mode</b> - Hide colors outside the P3 color space </span>
+          </label>
         </div>
       </div>
-      <div class="control">
-        <label for="lumInput"
-          title="Lightness represents the perceived brightness of a color, ranging from 0% (pure black) to 100% (pure white), reflecting how light or dark a color appears">Lightness</label>
-
-        <input type="range" id="lumInput" min="0" max="100" step="1" value="74" />
-        <input type="number" id="lumValue" min="0" max="100" step="1" value="74" />
-      </div>
-      <div class="control">
-        <label for="chromaInput"
-          title="Chroma measures the vividness or intensity of a color, from 0 (completely uncolored or gray) to a maximum that varies by hue but is generally around 0.37, indicating how pure or saturated a color is.">Chroma</label>
-
-        <input type="range" id="chromaInput" min="0" max="36" step="1" value="14" />
-        <input type="number" id="chromaValue" min="0" max="36" step="1" value="14" />
-      </div>
-      <div class="control">
-        <label for="diffInput"
-          title="The difference calculation is done using the CIEDE2000 formula, which takes into account variations in hue, chroma, and lightness between two colors to calculate perceived differences as seen by the human eye.">Difference</label>
-        <input type="range" id="diffInput" min="0" max="20" value="10" step="1" />
-        <input type="number" id="diffValue" min="0" max="20" step="1" value="10" />
-      </div>
-
-      <div class="control color-blind">
-        <label for="colorBlindMode">
-          <input type="checkbox" id="colorBlindMode" />
-          <span>
-            <b>Color Blind Mode</b> - Hide similar colors for
-            <a href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/"
-              target="_blank">Deuteranomaly</a></span>
-        </label>
-      </div>
-      <div class="control p3">
-        <label for="p3Mode">
-          <input type="checkbox" id="p3Mode" />
-          <span><b>P3 Mode</b> - Hide colors outside the P3 color space </span>
-        </label>
+      <div class="info">
+        This tool uses the
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch" target="_blank"
+          >OKLCH color format</a
+        >
+        to generate a perceptually uniform full-spectrum color palette, ensuring that changes in
+        color values correspond to equal changes in perceived luminosity and contrast. It supports a
+        wider color gamut for accurate representation on modern displays and uses APAC to check
+        contrast ratios. Additionally, it employs the CIEDE2000 formula to scientifically calculate
+        color difference. Learn more about OKLCH's benefits
+        <a
+          class="number"
+          href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
+          target="_blank"
+          >[1]</a
+        >,
+        <a
+          class="number"
+          href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl"
+          target="_blank"
+          >[2]</a
+        >,
+        <a
+          class="number"
+          href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/"
+          target="_blank"
+          >[3]</a
+        >, and APAC's advantages
+        <a href="https://ruitina.com/apca-accessible-colour-contrast/" target="_blank">here</a>.
       </div>
     </div>
-    <div class="info">
-      This tool uses the
-      <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch" target="_blank">OKLCH color
-        format</a>
-      to generate a perceptually uniform full-spectrum color palette, ensuring
-      that changes in color values correspond to equal changes in perceived
-      luminosity and contrast. It supports a wider color gamut for accurate
-      representation on modern displays and uses APAC to check contrast
-      ratios. Additionally, it employs the CIEDE2000 formula to scientifically
-      calculate color difference. Learn more about OKLCH's benefits
-      <a class="number" href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
-        target="_blank">[1]</a>,
-      <a class="number" href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl"
-        target="_blank">[2]</a>,
-      <a class="number" href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/"
-        target="_blank">[3]</a>, and APAC's advantages
-      <a href="https://ruitina.com/apca-accessible-colour-contrast/" target="_blank">here</a>.
-    </div>
-  </div>
-  <div id="colorGrid"></div>
-</body>
-
+    <div id="colorGrid"></div>
+  </body>
 </html>
