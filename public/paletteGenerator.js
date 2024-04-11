@@ -13,12 +13,7 @@ export function generatePalette(
   const colorBlindCache = {};
 
   for (let hue = 0; hue < 360; hue++) {
-    let color = {
-      lightness: lightnessValue,
-      chroma: chromaValue,
-      hue: hue,
-    };
-
+    const color = { lightness: lightnessValue, chroma: chromaValue, hue };
     if (
       isColorToAdd(
         color,
@@ -43,12 +38,8 @@ function isColorToAdd(
   p3ModeEnabled,
   colorBlindCache,
 ) {
-  let colorJS;
-  if (p3ModeEnabled) {
-    colorJS = new Color(
-      `oklch(${color.lightness} ${color.chroma} ${color.hue})`,
-    );
-    if (!colorJS.inGamut('p3')) return false;
+  if (p3ModeEnabled && !isInP3Gamut(color)) {
+    return false;
   }
   return isDistinctColor(
     color,
@@ -59,6 +50,11 @@ function isColorToAdd(
   );
 }
 
+function isInP3Gamut(color) {
+  const colorJS = new Color(`oklch(${color.lightness} ${color.chroma} ${color.hue})`);
+  return colorJS.inGamut('p3');
+}
+
 function isDistinctColor(
   color,
   uniqueColors,
@@ -67,28 +63,39 @@ function isDistinctColor(
   colorBlindCache,
 ) {
   return uniqueColors.every((uc) => {
-    let distance = chroma.deltaE(
-      chroma.oklch(color.lightness, color.chroma, color.hue),
-      chroma.oklch(uc.lightness, uc.chroma, uc.hue),
-    );
+    let distance = calculateColorDistance(color, uc);
     if (colorBlindModeEnabled) {
-      const colorHex = chroma
-        .oklch(color.lightness, color.chroma, color.hue)
-        .hex();
-      const ucHex = chroma.oklch(uc.lightness, uc.chroma, uc.hue).hex();
-      const colorDeuteranomaly =
-        colorBlindCache[colorHex] ||
-        (colorBlindCache[colorHex] = chroma(
-          blinder.deuteranomaly(colorHex),
-        ).hex());
-      const comparisonColorDeuteranomaly =
-        colorBlindCache[ucHex] ||
-        (colorBlindCache[ucHex] = chroma(blinder.deuteranomaly(ucHex)).hex());
-      distance = Math.min(
-        distance,
-        chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly),
-      );
+      distance = adjustForColorBlindness(color, uc, colorBlindCache, distance);
     }
     return distance >= minimumDistance;
   });
+}
+
+function calculateColorDistance(color, uc) {
+  return chroma.deltaE(
+    chroma.oklch(color.lightness, color.chroma, color.hue),
+    chroma.oklch(uc.lightness, uc.chroma, uc.hue),
+  );
+}
+
+function adjustForColorBlindness(color, uc, colorBlindCache, originalDistance) {
+  const colorHex = getColorHex(color);
+  const ucHex = getColorHex(uc);
+  const colorDeuteranomaly = getDeuteranomaly(colorHex, colorBlindCache);
+  const comparisonColorDeuteranomaly = getDeuteranomaly(ucHex, colorBlindCache);
+  return Math.min(
+    originalDistance,
+    chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly),
+  );
+}
+
+function getColorHex(color) {
+  return chroma.oklch(color.lightness, color.chroma, color.hue).hex();
+}
+
+function getDeuteranomaly(colorHex, colorBlindCache) {
+  return (
+    colorBlindCache[colorHex] ||
+    (colorBlindCache[colorHex] = chroma(blinder.deuteranomaly(colorHex)).hex())
+  );
 }

@@ -6,9 +6,7 @@ function createColorBlock(color, nextColor, firstColor) {
   block.className = 'color';
   block.style.backgroundColor = getColorStyle(color);
   block.innerHTML = getColorContent(color);
-  block.style.color = contrastChecker(
-    chroma.oklch(...Object.values(color)).hex(),
-  );
+  block.style.color = contrastChecker(chroma.oklch(...Object.values(color)).hex());
   appendDeltaSpan(block, color, nextColor || firstColor);
   return block;
 }
@@ -50,8 +48,7 @@ function formatDelta(delta) {
 function renderPalette(palette) {
   const grid = document.getElementById('colorGrid');
   if (palette.length === 0) {
-    grid.innerHTML =
-      '<div class="error">No colors are within the P3 color space</div>';
+    grid.innerHTML = '<div class="error">No colors are within the P3 color space</div>';
     return;
   }
   if (paletteChanged(palette, [])) {
