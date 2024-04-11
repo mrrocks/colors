@@ -121,6 +121,7 @@ input[type='checkbox']:checked::before {
 }
 
 select {
+  background-color: var(--body-background);
   color: var(--gray-1);
   border: 1.5px solid var(--gray-4);
   border-radius: 2px;
@@ -130,6 +131,10 @@ select {
   background-size: 8px 5px;
   background-repeat: no-repeat;
   background-position: right 8px top 50%;
+}
+
+select:focus {
+  background-color: var(--body-background);
 }
 
 input[type='range']:focus {
