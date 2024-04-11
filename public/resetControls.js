@@ -17,21 +17,9 @@ export function resetControls(elements, defaultValues) {
   colorFormatSelect.value = defaultValues.colorFormat;
   p3ModeCheckbox.checked = defaultValues.p3Mode;
 
-  syncValues(
-    lumSlider,
-    document.getElementById('lumValue'),
-    defaultValues.lumInput,
-  );
-  syncValues(
-    chromaSlider,
-    document.getElementById('chromaValue'),
-    defaultValues.chromaInput,
-  );
-  syncValues(
-    diffSlider,
-    document.getElementById('diffValue'),
-    defaultValues.diffInput,
-  );
+  syncValues(lumSlider, document.getElementById('lumValue'), defaultValues.lumInput);
+  syncValues(chromaSlider, document.getElementById('chromaValue'), defaultValues.chromaInput);
+  syncValues(diffSlider, document.getElementById('diffValue'), defaultValues.diffInput);
 
   refreshGrid(true);
 }

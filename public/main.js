@@ -2,7 +2,7 @@ import { generatePalette } from './paletteGenerator.js';
 import { renderPalette } from './colorGridRenderer.js';
 import { exportColors } from './exportColors.js';
 import { resetControls } from './resetControls.js';
-import { updateURLParameters } from './urlParamsManager.js';
+import { updateURLParameters, getUrlParams } from './urlParamsManager.js';
 import { saveSettings } from './saveSettings.js';
 import { updateSliderBackground, debounce } from './utils.js';
 
@@ -10,6 +10,9 @@ const colorCount = document.getElementById('colorCount');
 const lumSlider = document.getElementById('lumInput');
 const chromaSlider = document.getElementById('chromaInput');
 const diffSlider = document.getElementById('diffInput');
+const lumValue = document.getElementById('lumValue');
+const chromaValue = document.getElementById('chromaValue');
+const diffValue = document.getElementById('diffValue');
 const resetButton = document.getElementById('resetButton');
 const exportButton = document.getElementById('exportButton');
 const colorBlindModeCheckbox = document.getElementById('colorBlindMode');
@@ -71,13 +74,7 @@ function updatePalette(settings) {
   const chroma = settings.chroma ?? defaultValues.chromaInput / 100;
   const diff = settings.diff ?? defaultValues.diffInput;
 
-  const newPalette = generatePalette(
-    lum,
-    chroma,
-    diff,
-    settings.colorBlindMode,
-    settings.p3Mode,
-  );
+  const newPalette = generatePalette(lum, chroma, diff, settings.colorBlindMode, settings.p3Mode);
   palette = newPalette;
 }
 
@@ -117,40 +114,56 @@ function setupEventListeners() {
       defaultValues,
     ),
   );
-  exportButton.addEventListener('click', () =>
-    exportColors(palette, colorFormatSelect.value),
-  );
+  exportButton.addEventListener('click', () => exportColors(palette, colorFormatSelect.value));
   colorBlindModeCheckbox.addEventListener('change', () => refreshGrid());
   p3ModeCheckbox.addEventListener('change', () => refreshGrid());
   colorFormatSelect.addEventListener('change', () => refreshGrid());
 }
 
-function init() {
-  setupEventListeners();
+function initializeSettings() {
+  const urlParams = getUrlParams();
 
-  syncSliderAndInput(
-    lumSlider,
-    document.getElementById('lumValue'),
-    defaultValues.lumInput.toString(),
-  );
-  syncSliderAndInput(
-    chromaSlider,
-    document.getElementById('chromaValue'),
-    defaultValues.chromaInput.toString(),
-  );
-  syncSliderAndInput(
-    diffSlider,
-    document.getElementById('diffValue'),
-    defaultValues.diffInput.toString(),
-  );
+  const settings = {
+    lumInput: urlParams.lumInput || localStorage.getItem('lumInput') || defaultValues.lumInput,
+    chromaInput:
+      urlParams.chromaInput || localStorage.getItem('chromaInput') || defaultValues.chromaInput,
+    diffInput: urlParams.diffInput || localStorage.getItem('diffInput') || defaultValues.diffInput,
+    colorFormat:
+      urlParams.colorFormat || localStorage.getItem('colorFormat') || defaultValues.colorFormat,
+    colorBlindMode:
+      urlParams.colorBlindMode !== null
+        ? urlParams.colorBlindMode
+        : localStorage.getItem('colorBlindMode') === 'true' || defaultValues.colorBlindMode,
+    p3Mode:
+      urlParams.p3Mode !== null
+        ? urlParams.p3Mode
+        : localStorage.getItem('p3Mode') === 'true' || defaultValues.p3Mode,
+  };
 
-  colorFormatSelect.value =
-    localStorage.getItem('colorFormat') || defaultValues.colorFormat;
-  colorBlindModeCheckbox.checked =
-    localStorage.getItem('colorBlindMode') === 'true';
-  p3ModeCheckbox.checked = localStorage.getItem('p3Mode') === 'true';
+  syncValues(lumSlider, document.getElementById('lumValue'), settings.lumInput);
+  syncValues(chromaSlider, document.getElementById('chromaValue'), settings.chromaInput);
+  syncValues(diffSlider, document.getElementById('diffValue'), settings.diffInput);
+  colorBlindModeCheckbox.checked = settings.colorBlindMode;
+  p3ModeCheckbox.checked = settings.p3Mode;
+  colorFormatSelect.value = settings.colorFormat;
 
   refreshGrid();
+}
+
+function init() {
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeSettings();
+    setupEventListeners();
+    syncSliderAndInput(lumSlider, lumValue, defaultValues.lumInput.toString());
+    syncSliderAndInput(chromaSlider, chromaValue, defaultValues.chromaInput.toString());
+    syncSliderAndInput(diffSlider, diffValue, defaultValues.diffInput.toString());
+
+    colorFormatSelect.value = localStorage.getItem('colorFormat') || defaultValues.colorFormat;
+    colorBlindModeCheckbox.checked = localStorage.getItem('colorBlindMode') === 'true';
+    p3ModeCheckbox.checked = localStorage.getItem('p3Mode') === 'true';
+
+    refreshGrid();
+  });
 }
 
 init();

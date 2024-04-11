@@ -10,3 +10,15 @@ export function updateURLParameters(params) {
     history.replaceState(null, null, '?' + queryParams.toString());
   }, 250);
 }
+
+export function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    lumInput: params.get('L'),
+    chromaInput: params.get('C'),
+    diffInput: params.get('D'),
+    colorFormat: params.get('F'),
+    colorBlindMode: params.get('CB') === 'ON',
+    p3Mode: params.get('P3') === 'ON',
+  };
+}
