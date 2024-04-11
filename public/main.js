@@ -4,7 +4,7 @@ import { exportColors } from './exportColors.js';
 import { resetControls } from './resetControls.js';
 import { updateURLParameters } from './urlParamsManager.js';
 import { saveSettings } from './saveSettings.js';
-import { updateSliderBackground } from './utils.js';
+import { updateSliderBackground, debounce } from './utils.js';
 
 const colorCount = document.getElementById('colorCount');
 const lumSlider = document.getElementById('lumInput');
@@ -91,13 +91,15 @@ function syncSliderAndInput(slider, input, defaultValue) {
   const storedValue = localStorage.getItem(slider.id) || defaultValue;
   syncValues(slider, input, storedValue);
 
+  const debouncedRefreshGrid = debounce(refreshGrid, 20);
+
   slider.oninput = () => {
     syncValues(slider, input, slider.value);
-    refreshGrid();
+    debouncedRefreshGrid();
   };
   input.oninput = () => {
     syncValues(slider, input, input.value);
-    refreshGrid();
+    debouncedRefreshGrid();
   };
 }
 

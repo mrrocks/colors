@@ -1,48 +1,50 @@
 import chroma from 'chroma-js';
 import { contrastChecker } from './contrastChecker.js';
 
-function colorBlock(color, nextColor, firstColor) {
+function createColorBlock(color, nextColor, firstColor) {
   const block = document.createElement('div');
-  block.classList.add('color');
+  block.className = 'color';
+  block.style.backgroundColor = getColorStyle(color);
+  block.innerHTML = getColorContent(color);
+  block.style.color = contrastChecker(
+    chroma.oklch(...Object.values(color)).hex(),
+  );
+  appendDeltaSpan(block, color, nextColor || firstColor);
+  return block;
+}
 
-  const [l, c, h] = color.oklch();
-  block.style.backgroundColor = `oklch(${l} ${c} ${h})`;
+function getColorStyle(color) {
+  return `oklch(${color.lightness} ${color.chroma} ${color.hue})`;
+}
 
+function getColorContent(color) {
   const format = document.getElementById('colorFormat').value;
-
+  const colorObj = chroma.oklch(...Object.values(color));
   switch (format) {
     case 'hex':
-      block.innerHTML = color.hex();
-      break;
+      return colorObj.hex();
     case 'rgb':
-      block.innerHTML = color.rgb().join(', ');
-      break;
+      return colorObj.rgb();
     case 'oklch':
-      block.innerHTML = `${l}<br>${c}<br>${h}`;
-      break;
+      return `${color.lightness},${color.chroma},${color.hue}`;
     default:
-      block.innerHTML = color.hex();
+      return color;
   }
+}
 
-  block.style.color = contrastChecker(color.hex());
-
-  const formatDelta = (delta) =>
-    `${(Math.round(delta * 10) / 10).toFixed(1)}% ▸`;
-
-  const deltaNext = formatDelta(
-    nextColor
-      ? chroma.deltaE(color, nextColor)
-      : chroma.deltaE(color, firstColor),
-  );
-
+function appendDeltaSpan(block, color, comparisonColor) {
+  const colorHex = chroma.oklch(...Object.values(color)).hex();
+  const comparisonHex = chroma.oklch(...Object.values(comparisonColor)).hex();
+  const deltaNext = formatDelta(chroma.deltaE(colorHex, comparisonHex));
   const deltaSpan = document.createElement('span');
   deltaSpan.className = 'deltas';
   deltaSpan.innerHTML = deltaNext;
   deltaSpan.title = 'Relative color difference against next color';
-
   block.appendChild(deltaSpan);
+}
 
-  return block;
+function formatDelta(delta) {
+  return `${(Math.round(delta * 10) / 10).toFixed(1)}% ▸`;
 }
 
 function renderPalette(palette) {
@@ -57,8 +59,7 @@ function renderPalette(palette) {
     const fragment = document.createDocumentFragment();
     palette.forEach((color, index) => {
       const nextColor = palette[index + 1] || palette[0];
-      const block = colorBlock(color, nextColor, palette[0]);
-      fragment.appendChild(block);
+      fragment.appendChild(createColorBlock(color, nextColor, palette[0]));
     });
     grid.appendChild(fragment);
   }

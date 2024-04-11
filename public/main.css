@@ -344,7 +344,7 @@ input[type='range']::-webkit-slider-thumb {
 
 @media (max-width: 660px) {
   :root {
-    --header-height: 316px;
+    --header-height: 348px;
   }
   body {
     flex-direction: column;

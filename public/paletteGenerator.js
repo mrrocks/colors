@@ -13,13 +13,15 @@ export function generatePalette(
   const colorBlindCache = {};
 
   for (let hue = 0; hue < 360; hue++) {
-    let color = chroma.oklch(lightnessValue, chromaValue, hue);
+    let color = {
+      lightness: lightnessValue,
+      chroma: chromaValue,
+      hue: hue,
+    };
+
     if (
       isColorToAdd(
         color,
-        lightnessValue,
-        chromaValue,
-        hue,
         uniqueColors,
         minimumDistance,
         colorBlindModeEnabled,
@@ -35,9 +37,6 @@ export function generatePalette(
 
 function isColorToAdd(
   color,
-  lightnessValue,
-  chromaValue,
-  hue,
   uniqueColors,
   minimumDistance,
   colorBlindModeEnabled,
@@ -46,7 +45,9 @@ function isColorToAdd(
 ) {
   let colorJS;
   if (p3ModeEnabled) {
-    colorJS = new Color(`oklch(${lightnessValue} ${chromaValue} ${hue})`);
+    colorJS = new Color(
+      `oklch(${color.lightness} ${color.chroma} ${color.hue})`,
+    );
     if (!colorJS.inGamut('p3')) return false;
   }
   return isDistinctColor(
@@ -66,10 +67,15 @@ function isDistinctColor(
   colorBlindCache,
 ) {
   return uniqueColors.every((uc) => {
-    let distance = chroma.deltaE(color.hex(), uc.hex());
+    let distance = chroma.deltaE(
+      chroma.oklch(color.lightness, color.chroma, color.hue),
+      chroma.oklch(uc.lightness, uc.chroma, uc.hue),
+    );
     if (colorBlindModeEnabled) {
-      const colorHex = color.hex();
-      const ucHex = uc.hex();
+      const colorHex = chroma
+        .oklch(color.lightness, color.chroma, color.hue)
+        .hex();
+      const ucHex = chroma.oklch(uc.lightness, uc.chroma, uc.hue).hex();
       const colorDeuteranomaly =
         colorBlindCache[colorHex] ||
         (colorBlindCache[colorHex] = chroma(
