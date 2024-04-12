@@ -2,8 +2,6 @@ import chroma from 'chroma-js';
 import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
-const colorGrid = new Map();
-
 export function generatePalette(options) {
   const { lightness, chroma, distance, colorBlindMode, p3Mode } = options;
   const uniqueColors = [];
