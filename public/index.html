@@ -34,7 +34,7 @@
         <div class="control">
           <label
             for="lightnessInput"
-            title="Lightness represents the perceived brightness of a color, ranging from 0% (pure black) to 100% (pure white), reflecting how light or dark a color appears"
+            title="Lightness represents the perceived brightness of a color, ranging from 0 (pure black) to 1 (pure white), reflecting how light or dark a color appears"
             >Lightness</label
           >
 
@@ -80,24 +80,30 @@
         </div>
       </div>
       <div class="info">
-        This tool uses the
-        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch" target="_blank"
-          >OKLCH color format</a
-        >
-        to generate a perceptually uniform full-spectrum color palette, ensuring that changes in color values correspond
-        to equal changes in perceived luminosity and contrast. It supports a wider color gamut for accurate
-        representation on modern displays and uses APAC to check contrast ratios. Additionally, it employs the CIEDE2000
-        formula to scientifically calculate color difference. Learn more about OKLCH's benefits
-        <a class="number" href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/" target="_blank"
-          >[1]</a
-        >,
-        <a class="number" href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl" target="_blank"
-          >[2]</a
-        >,
-        <a class="number" href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/" target="_blank"
-          >[3]</a
-        >, and APAC's advantages
-        <a href="https://ruitina.com/apca-accessible-colour-contrast/" target="_blank">here</a>.
+        <p>
+          This tool uses the
+          <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch" target="_blank"
+            >OKLCH color format</a
+          >
+          to generate a perceptually uniform full-spectrum color palette, ensuring that changes in color values
+          correspond to equal changes in perceived luminosity and contrast. It supports a wider color gamut for accurate
+          representation on modern displays and uses APAC to check contrast ratios. Additionally, it employs the
+          CIEDE2000 formula to scientifically calculate color difference. Learn more about OKLCH's benefits
+          <a
+            class="number"
+            href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
+            target="_blank"
+            >[1]</a
+          >,
+          <a class="number" href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl" target="_blank"
+            >[2]</a
+          >,
+          <a class="number" href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/" target="_blank"
+            >[3]</a
+          >, and APAC's advantages
+          <a href="https://ruitina.com/apca-accessible-colour-contrast/" target="_blank">here</a>.
+        </p>
+        <p>Made by Fran Perez - <a href="https://twitter.com/mrrocks" target="_blank">@mrrocks</a></p>
       </div>
     </div>
     <div id="colorGrid"></div>

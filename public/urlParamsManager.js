@@ -29,14 +29,14 @@ function encodeParams(params) {
 }
 
 function decodeParams(search) {
-  return {
-    lightness: parseInt(search.substring(0, 2), 10) / PERCENT_MULTIPLIER,
-    chroma: parseInt(search.substring(2, 4), 10) / PERCENT_MULTIPLIER,
-    distance: parseInt(search.substring(4, 6), 10),
-    colorFormat: REVERSE_FORMAT_MAPPING[search.charAt(6)],
-    colorBlindMode: search.charAt(7) === '1',
-    p3Mode: search.charAt(8) === '1',
-  };
+  const lightness = parseInt(search.substring(0, 2), 10) / PERCENT_MULTIPLIER;
+  const chroma = parseInt(search.substring(2, 4), 10) / PERCENT_MULTIPLIER;
+  const distance = parseInt(search.substring(4, 6), 10);
+  const colorFormat = REVERSE_FORMAT_MAPPING[search.charAt(6)];
+  const colorBlindMode = search.charAt(7) === '1';
+  const p3Mode = search.charAt(8) === '1';
+
+  return { lightness, chroma, distance, colorFormat, colorBlindMode, p3Mode };
 }
 
 export function updateURLParameters(params) {
@@ -45,6 +45,12 @@ export function updateURLParameters(params) {
 }
 
 export function getUrlParams() {
-  const search = window.location.search.substring(1);
-  return decodeParams(search);
+  const searchParams = new URLSearchParams(window.location.search);
+  const parameters = {};
+
+  for (const [key, value] of searchParams) {
+    parameters[key] = value;
+  }
+
+  return parameters;
 }

@@ -168,7 +168,7 @@ input[type='range']:focus::-webkit-slider-thumb {
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 424px;
-  max-width: 680px;
+  max-width: 600px;
 }
 
 #colorGrid {
@@ -249,7 +249,7 @@ input[type='range']:focus::-webkit-slider-thumb {
 }
 
 .control input[type='number'] {
-  width: 32px;
+  width: 44px;
   height: 28px;
   color: var(--gray-2);
   border: 1.5px solid var(--gray-4);
@@ -335,6 +335,9 @@ input[type='range']:focus::-webkit-slider-thumb {
   letter-spacing: 1px;
 }
 
+.info p:last-child {
+  margin-top: 24px;
+}
 /* Range */
 
 input[type='range'] {

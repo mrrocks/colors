@@ -1,15 +1,17 @@
+import chroma from 'chroma-js'; // Ensure you import the library
+
 function exportColors(palette, format) {
   let colorText = palette
     .map((color) => {
+      // Assuming color is an object with properties lightness, chroma, and hue
+      let colorObj = chroma.oklch(color.lightness, color.chroma, color.hue);
       switch (format) {
         case 'hex':
-          return color.hex();
+          return colorObj.hex();
         case 'rgb':
-          return `rgb(${color.rgb().join(', ')})`;
-        case 'oklch': {
-          const [l, c, h] = color.oklch();
-          return `oklch(${l} ${c} ${h})`;
-        }
+          return `rgb(${colorObj.rgb().join(', ')})`;
+        case 'oklch':
+          return `oklch(${color.lightness} ${color.chroma} ${color.hue})`;
         default:
           return '';
       }
@@ -19,7 +21,7 @@ function exportColors(palette, format) {
   const blob = new Blob([colorText], { type: 'text/plain' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = 'colors.txt';
+  link.download = `${format}-colors.txt`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
