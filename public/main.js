@@ -7,12 +7,12 @@ import { saveSettings } from './saveSettings.js';
 import { updateSliderBackground, debounce } from './utils.js';
 
 const colorCount = document.getElementById('colorCount');
-const lumSlider = document.getElementById('lumInput');
+const lightnessSlider = document.getElementById('lightnessInput');
 const chromaSlider = document.getElementById('chromaInput');
-const diffSlider = document.getElementById('diffInput');
-const lumValue = document.getElementById('lumValue');
+const distanceSlider = document.getElementById('distanceInput');
+const lightnessValue = document.getElementById('lightnessValue');
 const chromaValue = document.getElementById('chromaValue');
-const diffValue = document.getElementById('diffValue');
+const distanceValue = document.getElementById('distanceValue');
 const resetButton = document.getElementById('resetButton');
 const exportButton = document.getElementById('exportButton');
 const colorBlindModeCheckbox = document.getElementById('colorBlindMode');
@@ -22,9 +22,9 @@ const colorFormatSelect = document.getElementById('colorFormat');
 let palette = [];
 
 const defaultValues = {
-  lumInput: 78,
-  chromaInput: 14,
-  diffInput: 10,
+  lightness: 78,
+  chroma: 14,
+  distance: 10,
   colorBlindMode: false,
   colorFormat: 'hex',
   p3Mode: false,
@@ -33,15 +33,14 @@ const defaultValues = {
 function updateCount(length) {
   colorCount.textContent = length;
 }
-
 export function refreshGrid(isReset = false) {
   requestAnimationFrame(() => {
     const settings = isReset
       ? defaultValues
       : {
-          lum: parseFloat(lumSlider.value) / 100,
+          lightness: parseFloat(lightnessSlider.value) / 100,
           chroma: parseFloat(chromaSlider.value) / 100,
-          diff: parseInt(diffSlider.value),
+          distance: parseInt(distanceSlider.value),
           colorBlindMode: colorBlindModeCheckbox.checked,
           p3Mode: p3ModeCheckbox.checked,
           colorFormat: colorFormatSelect.value,
@@ -51,17 +50,17 @@ export function refreshGrid(isReset = false) {
     updateCount(palette.length);
     renderPalette(palette);
     saveSettings({
-      lumInput: lumSlider.value,
-      chromaInput: chromaSlider.value,
-      diffInput: diffSlider.value,
+      lightness: lightnessSlider.value,
+      chroma: chromaSlider.value,
+      distance: distanceSlider.value,
       colorBlindMode: colorBlindModeCheckbox.checked,
       colorFormat: colorFormatSelect.value,
       p3Mode: p3ModeCheckbox.checked,
     });
     updateURLParameters({
-      lumInput: lumSlider.value.padStart(2, '0'),
-      chromaInput: chromaSlider.value.padStart(2, '0'),
-      diffInput: diffSlider.value.padStart(2, '0'),
+      lightness: lightnessSlider.value.padStart(2, '0'),
+      chroma: chromaSlider.value.padStart(2, '0'),
+      distance: distanceSlider.value.padStart(2, '0'),
       colorBlindMode: colorBlindModeCheckbox.checked,
       p3Mode: p3ModeCheckbox.checked,
       colorFormat: colorFormatSelect.value,
@@ -70,11 +69,17 @@ export function refreshGrid(isReset = false) {
 }
 
 function updatePalette(settings) {
-  const lum = settings.lum ?? defaultValues.lumInput / 100;
-  const chroma = settings.chroma ?? defaultValues.chromaInput / 100;
-  const diff = settings.diff ?? defaultValues.diffInput;
+  const lightness = settings.lightness ?? defaultValues.lightness / 100;
+  const chroma = settings.chroma ?? defaultValues.chroma / 100;
+  const distance = settings.distance ?? defaultValues.distance;
 
-  const newPalette = generatePalette(lum, chroma, diff, settings.colorBlindMode, settings.p3Mode);
+  const newPalette = generatePalette({
+    lightness: lightness,
+    chromaValue: chroma,
+    minimumDistance: distance,
+    colorBlindMode: settings.colorBlindMode,
+    p3Mode: settings.p3Mode,
+  });
   palette = newPalette;
 }
 
@@ -104,9 +109,9 @@ function setupEventListeners() {
   resetButton.addEventListener('click', () =>
     resetControls(
       {
-        lumSlider: lumSlider,
+        lightnessSlider: lightnessSlider,
         chromaSlider: chromaSlider,
-        diffSlider: diffSlider,
+        distanceSlider: distanceSlider,
         colorBlindModeCheckbox: colorBlindModeCheckbox,
         colorFormatSelect: colorFormatSelect,
         p3ModeCheckbox: p3ModeCheckbox,
@@ -124,10 +129,9 @@ function initializeSettings() {
   const urlParams = getUrlParams();
 
   const settings = {
-    lumInput: urlParams.lumInput || localStorage.getItem('lumInput') || defaultValues.lumInput,
-    chromaInput:
-      urlParams.chromaInput || localStorage.getItem('chromaInput') || defaultValues.chromaInput,
-    diffInput: urlParams.diffInput || localStorage.getItem('diffInput') || defaultValues.diffInput,
+    lightness: urlParams.lightness || localStorage.getItem('lightness') || defaultValues.lightness,
+    chroma: urlParams.chroma || localStorage.getItem('chroma') || defaultValues.chroma,
+    distance: urlParams.distance || localStorage.getItem('distance') || defaultValues.distance,
     colorFormat:
       urlParams.colorFormat || localStorage.getItem('colorFormat') || defaultValues.colorFormat,
     colorBlindMode:
@@ -140,9 +144,9 @@ function initializeSettings() {
         : localStorage.getItem('p3Mode') === 'true' || defaultValues.p3Mode,
   };
 
-  syncValues(lumSlider, document.getElementById('lumValue'), settings.lumInput);
-  syncValues(chromaSlider, document.getElementById('chromaValue'), settings.chromaInput);
-  syncValues(diffSlider, document.getElementById('diffValue'), settings.diffInput);
+  syncValues(lightnessSlider, document.getElementById('lightnessValue'), settings.lightness);
+  syncValues(chromaSlider, document.getElementById('chromaValue'), settings.chroma);
+  syncValues(distanceSlider, document.getElementById('distanceValue'), settings.distance);
   colorBlindModeCheckbox.checked = settings.colorBlindMode;
   p3ModeCheckbox.checked = settings.p3Mode;
   colorFormatSelect.value = settings.colorFormat;
@@ -154,9 +158,9 @@ function init() {
   document.addEventListener('DOMContentLoaded', () => {
     initializeSettings();
     setupEventListeners();
-    syncSliderAndInput(lumSlider, lumValue, defaultValues.lumInput.toString());
-    syncSliderAndInput(chromaSlider, chromaValue, defaultValues.chromaInput.toString());
-    syncSliderAndInput(diffSlider, diffValue, defaultValues.diffInput.toString());
+    syncSliderAndInput(lightnessSlider, lightnessValue, defaultValues.lightness.toString());
+    syncSliderAndInput(chromaSlider, chromaValue, defaultValues.chroma.toString());
+    syncSliderAndInput(distanceSlider, distanceValue, defaultValues.distance.toString());
 
     colorFormatSelect.value = localStorage.getItem('colorFormat') || defaultValues.colorFormat;
     colorBlindModeCheckbox.checked = localStorage.getItem('colorBlindMode') === 'true';

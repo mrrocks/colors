@@ -2,52 +2,29 @@ import chroma from 'chroma-js';
 import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
-export function generatePalette(
-  lightnessValue,
-  chromaValue,
-  minimumDistance,
-  colorBlindModeEnabled,
-  p3ModeEnabled,
-) {
+export function generatePalette(options) {
+  const { lightness, chromaValue, minimumDistance, colorBlindMode, p3Mode } = options;
   const uniqueColors = [];
-  const colorBlindCache = {};
 
   for (let hue = 0; hue < 360; hue++) {
-    const color = { lightness: lightnessValue, chroma: chromaValue, hue };
-    if (
-      isColorToAdd(
-        color,
-        uniqueColors,
-        minimumDistance,
-        colorBlindModeEnabled,
-        p3ModeEnabled,
-        colorBlindCache,
-      )
-    ) {
+    const color = createColor(lightness, chromaValue, hue);
+    if (shouldAddColor(color, uniqueColors, minimumDistance, colorBlindMode, p3Mode)) {
       uniqueColors.push(color);
     }
   }
+
   return uniqueColors;
 }
 
-function isColorToAdd(
-  color,
-  uniqueColors,
-  minimumDistance,
-  colorBlindModeEnabled,
-  p3ModeEnabled,
-  colorBlindCache,
-) {
-  if (p3ModeEnabled && !isInP3Gamut(color)) {
+function createColor(lightness, chroma, hue) {
+  return { lightness, chroma, hue };
+}
+
+function shouldAddColor(color, uniqueColors, minimumDistance, colorBlindMode, p3Mode) {
+  if (p3Mode && !isInP3Gamut(color)) {
     return false;
   }
-  return isDistinctColor(
-    color,
-    uniqueColors,
-    minimumDistance,
-    colorBlindModeEnabled,
-    colorBlindCache,
-  );
+  return isDistinctColor(color, uniqueColors, minimumDistance, colorBlindMode);
 }
 
 function isInP3Gamut(color) {
@@ -55,17 +32,11 @@ function isInP3Gamut(color) {
   return colorJS.inGamut('p3');
 }
 
-function isDistinctColor(
-  color,
-  uniqueColors,
-  minimumDistance,
-  colorBlindModeEnabled,
-  colorBlindCache,
-) {
+function isDistinctColor(color, uniqueColors, minimumDistance, colorBlindMode) {
   return uniqueColors.every((uc) => {
     let distance = calculateColorDistance(color, uc);
-    if (colorBlindModeEnabled) {
-      distance = adjustForColorBlindness(color, uc, colorBlindCache, distance);
+    if (colorBlindMode) {
+      distance = adjustForColorBlindness(color, uc, distance);
     }
     return distance >= minimumDistance;
   });
@@ -78,11 +49,11 @@ function calculateColorDistance(color, uc) {
   );
 }
 
-function adjustForColorBlindness(color, uc, colorBlindCache, originalDistance) {
+function adjustForColorBlindness(color, uc, originalDistance) {
   const colorHex = getColorHex(color);
   const ucHex = getColorHex(uc);
-  const colorDeuteranomaly = getDeuteranomaly(colorHex, colorBlindCache);
-  const comparisonColorDeuteranomaly = getDeuteranomaly(ucHex, colorBlindCache);
+  const colorDeuteranomaly = getDeuteranomaly(colorHex);
+  const comparisonColorDeuteranomaly = getDeuteranomaly(ucHex);
   return Math.min(
     originalDistance,
     chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly),
@@ -93,9 +64,6 @@ function getColorHex(color) {
   return chroma.oklch(color.lightness, color.chroma, color.hue).hex();
 }
 
-function getDeuteranomaly(colorHex, colorBlindCache) {
-  return (
-    colorBlindCache[colorHex] ||
-    (colorBlindCache[colorHex] = chroma(blinder.deuteranomaly(colorHex)).hex())
-  );
+function getDeuteranomaly(colorHex) {
+  return blinder.deuteranomaly(colorHex);
 }
