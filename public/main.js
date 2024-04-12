@@ -38,6 +38,7 @@ const refreshGrid = (settings) => {
     const palette = generatePalette(settings);
     updateCount(palette.length);
     renderPalette(palette);
+    syncAllSliders(settings);
     saveSettings(settings);
     updateURLParameters(settings);
   });
@@ -85,7 +86,6 @@ const setupEventListeners = () => {
     exportColors(generatePalette(getCurrentSettings()), elements.colorFormatSelect.value),
   );
   elements.resetButton.addEventListener('click', () => {
-    syncAllSliders(defaults);
     refreshGrid(defaults);
   });
 
@@ -107,13 +107,13 @@ const initializeSettings = () => {
   const urlParams = getUrlParams();
   const localStorageSettings = retrieveLocalStorageSettings();
   const settings = { ...defaults, ...localStorageSettings, ...urlParams };
-  syncAllSliders(settings);
+
   refreshGrid(settings);
 };
 
 const init = () => {
-  initializeSettings();
   setupEventListeners();
+  initializeSettings();
 };
 
 document.addEventListener('DOMContentLoaded', function () {
