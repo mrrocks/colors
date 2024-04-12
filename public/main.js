@@ -33,10 +33,18 @@ const defaultValues = {
 function updateCount(length) {
   colorCount.textContent = length;
 }
+
 export function refreshGrid(isReset = false) {
   requestAnimationFrame(() => {
     const settings = isReset
-      ? defaultValues
+      ? {
+          lightness: defaultValues.lightness / 100,
+          chroma: defaultValues.chroma / 100,
+          distance: defaultValues.distance,
+          colorBlindMode: defaultValues.colorBlindMode,
+          p3Mode: defaultValues.p3Mode,
+          colorFormat: defaultValues.colorFormat,
+        }
       : {
           lightness: parseFloat(lightnessSlider.value) / 100,
           chroma: parseFloat(chromaSlider.value) / 100,
@@ -75,8 +83,8 @@ function updatePalette(settings) {
 
   const newPalette = generatePalette({
     lightness: lightness,
-    chromaValue: chroma,
-    minimumDistance: distance,
+    chroma: chroma,
+    distance: distance,
     colorBlindMode: settings.colorBlindMode,
     p3Mode: settings.p3Mode,
   });

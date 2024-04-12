@@ -3,12 +3,12 @@ import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
 export function generatePalette(options) {
-  const { lightness, chromaValue, minimumDistance, colorBlindMode, p3Mode } = options;
+  const { lightness, chroma, distance, colorBlindMode, p3Mode } = options;
   const uniqueColors = [];
 
   for (let hue = 0; hue < 360; hue++) {
-    const color = createColor(lightness, chromaValue, hue);
-    if (shouldAddColor(color, uniqueColors, minimumDistance, colorBlindMode, p3Mode)) {
+    const color = createColor(lightness, chroma, hue);
+    if (shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode)) {
       uniqueColors.push(color);
     }
   }
@@ -20,11 +20,11 @@ function createColor(lightness, chroma, hue) {
   return { lightness, chroma, hue };
 }
 
-function shouldAddColor(color, uniqueColors, minimumDistance, colorBlindMode, p3Mode) {
+function shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode) {
   if (p3Mode && !isInP3Gamut(color)) {
     return false;
   }
-  return isDistinctColor(color, uniqueColors, minimumDistance, colorBlindMode);
+  return isDistinctColor(color, uniqueColors, distance, colorBlindMode);
 }
 
 function isInP3Gamut(color) {
@@ -32,13 +32,13 @@ function isInP3Gamut(color) {
   return colorJS.inGamut('p3');
 }
 
-function isDistinctColor(color, uniqueColors, minimumDistance, colorBlindMode) {
+function isDistinctColor(color, uniqueColors, distance, colorBlindMode) {
   return uniqueColors.every((uc) => {
-    let distance = calculateColorDistance(color, uc);
+    let distanceCalc = calculateColorDistance(color, uc);
     if (colorBlindMode) {
-      distance = adjustForColorBlindness(color, uc, distance);
+      distanceCalc = adjustForColorBlindness(color, uc, distanceCalc);
     }
-    return distance >= minimumDistance;
+    return distanceCalc >= distance;
   });
 }
 

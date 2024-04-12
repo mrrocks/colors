@@ -11,16 +11,15 @@ const reverseFormatMapping = {
 };
 
 function encodeParams(params) {
-  const { lightnessInput, chromaInput, distanceInput, colorFormat, colorBlindMode, p3Mode } =
-    params;
-  return `${lightnessInput}${chromaInput}${distanceInput}${formatMapping[colorFormat]}${colorBlindMode ? '1' : '0'}${p3Mode ? '1' : '0'}`;
+  const { lightness, chroma, distance, colorFormat, colorBlindMode, p3Mode } = params;
+  return `${lightness.padStart(2, '0')}${chroma.padStart(2, '0')}${distance.padStart(2, '0')}${formatMapping[colorFormat]}${colorBlindMode ? '1' : '0'}${p3Mode ? '1' : '0'}`;
 }
 
 function decodeParams(search) {
   return {
-    lightnessInput: search.substring(0, 2),
-    chromaInput: search.substring(2, 4),
-    distanceInput: search.substring(4, 6),
+    lightness: search.substring(0, 2),
+    chroma: search.substring(2, 4),
+    distance: search.substring(4, 6),
     colorFormat: reverseFormatMapping[search.charAt(6)],
     colorBlindMode: search.charAt(7) === '1',
     p3Mode: search.charAt(8) === '1',

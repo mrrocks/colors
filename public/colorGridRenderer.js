@@ -31,14 +31,18 @@ function getColorContent(color) {
 }
 
 function appendDeltaSpan(block, color, comparisonColor) {
-  const colorHex = chroma.oklch(...Object.values(color)).hex();
-  const comparisonHex = chroma.oklch(...Object.values(comparisonColor)).hex();
-  const deltaNext = formatDelta(chroma.deltaE(colorHex, comparisonHex));
+  const deltaNext = formatDelta(calculateDelta(color, comparisonColor));
   const deltaSpan = document.createElement('span');
   deltaSpan.className = 'deltas';
   deltaSpan.innerHTML = deltaNext;
   deltaSpan.title = 'Relative color difference against next color';
   block.appendChild(deltaSpan);
+}
+
+function calculateDelta(color, comparisonColor) {
+  const colorHex = chroma.oklch(...Object.values(color)).hex();
+  const comparisonHex = chroma.oklch(...Object.values(comparisonColor)).hex();
+  return chroma.deltaE(colorHex, comparisonHex);
 }
 
 function formatDelta(delta) {
