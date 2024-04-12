@@ -60,7 +60,7 @@ const syncValues = (slider, input, value) => {
 };
 
 const syncSliderAndInput = (slider, input) => {
-  const debouncedRefreshGrid = debounce(() => refreshGrid(getCurrentSettings()), 20);
+  const debouncedRefreshGrid = debounce(() => refreshGrid(getCurrentSettings()), 5);
 
   slider.oninput = () => {
     syncValues(slider, input, slider.value);

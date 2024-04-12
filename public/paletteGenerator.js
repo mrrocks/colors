@@ -2,14 +2,19 @@ import chroma from 'chroma-js';
 import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
+const colorGrid = new Map();
+
 export function generatePalette(options) {
   const { lightness, chroma, distance, colorBlindMode, p3Mode } = options;
   const uniqueColors = [];
+  const colorCache = new Map();
 
-  for (let hue = 0; hue < 360; hue++) {
+  for (let hue = 0; hue < 360; hue += 2) {
     const color = createColor(lightness, chroma, hue);
-    if (shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode)) {
+    const colorKey = `${lightness}-${chroma}-${hue}`;
+    if (!colorCache.has(colorKey) && shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode)) {
       uniqueColors.push(color);
+      colorCache.set(colorKey, color);
     }
   }
 
@@ -33,13 +38,16 @@ function isInP3Gamut(color) {
 }
 
 function isDistinctColor(color, uniqueColors, distance, colorBlindMode) {
-  return uniqueColors.every((uc) => {
+  for (const uc of uniqueColors) {
     let distanceCalc = calculateColorDistance(color, uc);
     if (colorBlindMode) {
       distanceCalc = adjustForColorBlindness(color, uc, distanceCalc);
     }
-    return distanceCalc >= distance;
-  });
+    if (distanceCalc < distance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function calculateColorDistance(color, uc) {
@@ -54,10 +62,7 @@ function adjustForColorBlindness(color, uc, originalDistance) {
   const ucHex = getColorHex(uc);
   const colorDeuteranomaly = getDeuteranomaly(colorHex);
   const comparisonColorDeuteranomaly = getDeuteranomaly(ucHex);
-  return Math.min(
-    originalDistance,
-    chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly),
-  );
+  return Math.min(originalDistance, chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly));
 }
 
 function getColorHex(color) {

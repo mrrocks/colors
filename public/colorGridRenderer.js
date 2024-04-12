@@ -1,12 +1,14 @@
 import chroma from 'chroma-js';
 import { contrastChecker } from './contrastChecker.js';
 
+const colorCache = new Map();
+
 function createColorBlock(color, nextColor, firstColor) {
   const block = document.createElement('div');
   block.className = 'color';
   block.style.backgroundColor = getColorStyle(color);
   block.innerHTML = getColorContent(color);
-  block.style.color = contrastChecker(chroma.oklch(...Object.values(color)).hex());
+  block.style.color = contrastChecker(getColorHex(color));
   appendDeltaSpan(block, color, nextColor || firstColor);
   return block;
 }
@@ -17,17 +19,29 @@ function getColorStyle(color) {
 
 function getColorContent(color) {
   const format = document.getElementById('colorFormat').value;
-  const colorObj = chroma.oklch(...Object.values(color));
+  const colorObj = getColorObj(color);
   switch (format) {
     case 'hex':
       return colorObj.hex();
     case 'rgb':
-      return colorObj.rgb();
+      return colorObj.rgb().join(',');
     case 'oklch':
       return `${color.lightness},${color.chroma},${color.hue}`;
     default:
       return color;
   }
+}
+
+function getColorObj(color) {
+  const key = JSON.stringify(color);
+  if (!colorCache.has(key)) {
+    colorCache.set(key, chroma.oklch(...Object.values(color)));
+  }
+  return colorCache.get(key);
+}
+
+function getColorHex(color) {
+  return getColorObj(color).hex();
 }
 
 function appendDeltaSpan(block, color, comparisonColor) {
@@ -40,9 +54,7 @@ function appendDeltaSpan(block, color, comparisonColor) {
 }
 
 function calculateDelta(color, comparisonColor) {
-  const colorHex = chroma.oklch(...Object.values(color)).hex();
-  const comparisonHex = chroma.oklch(...Object.values(comparisonColor)).hex();
-  return chroma.deltaE(colorHex, comparisonHex);
+  return chroma.deltaE(getColorHex(color), getColorHex(comparisonColor));
 }
 
 function formatDelta(delta) {
@@ -69,7 +81,7 @@ function renderPalette(palette) {
 function paletteChanged(oldPalette, newPalette) {
   return (
     oldPalette.length !== newPalette.length ||
-    !oldPalette.every((val, index) => val.hex() === newPalette[index].hex())
+    !oldPalette.every((val, index) => getColorHex(val) === getColorHex(newPalette[index]))
   );
 }
 
