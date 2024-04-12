@@ -38,16 +38,8 @@
             >Lightness</label
           >
 
-          <input type="range" id="lightnessInput" min="0" max="100" step="1" value="74" />
-          <input
-            type="number"
-            id="lightnessValue"
-            min="0"
-            max="100"
-            step="1"
-            value="74"
-            inputmode="numeric"
-          />
+          <input type="range" id="lightnessInput" min="0" max="1" step="0.01" />
+          <input type="number" id="lightnessValue" min="0" max="1" step="0.01" inputmode="numeric" />
         </div>
         <div class="control">
           <label
@@ -56,16 +48,8 @@
             >Chroma</label
           >
 
-          <input type="range" id="chromaInput" min="0" max="36" step="1" value="14" />
-          <input
-            type="number"
-            id="chromaValue"
-            min="0"
-            max="36"
-            step="1"
-            value="14"
-            inputmode="numeric"
-          />
+          <input type="range" id="chromaInput" min="0" max="0.37" step="0.01" />
+          <input type="number" id="chromaValue" min="0" max="0.37" step="0.01" inputmode="numeric" />
         </div>
         <div class="control">
           <label
@@ -74,15 +58,7 @@
             >Difference</label
           >
           <input type="range" id="distanceInput" min="0" max="20" value="10" step="1" />
-          <input
-            type="number"
-            id="distanceValue"
-            min="0"
-            max="20"
-            step="1"
-            value="10"
-            inputmode="numeric"
-          />
+          <input type="number" id="distanceValue" min="0" max="20" step="1" value="10" inputmode="numeric" />
         </div>
 
         <div class="control color-blind">
@@ -90,9 +66,7 @@
             <input type="checkbox" id="colorBlindMode" />
             <span>
               <b>Color Blind Mode</b> - Hide similar colors for
-              <a
-                href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/"
-                target="_blank"
+              <a href="https://www.color-blindness.com/deuteranopia-red-green-color-blindness/" target="_blank"
                 >Deuteranomaly</a
               ></span
             >
@@ -110,27 +84,17 @@
         <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch" target="_blank"
           >OKLCH color format</a
         >
-        to generate a perceptually uniform full-spectrum color palette, ensuring that changes in
-        color values correspond to equal changes in perceived luminosity and contrast. It supports a
-        wider color gamut for accurate representation on modern displays and uses APAC to check
-        contrast ratios. Additionally, it employs the CIEDE2000 formula to scientifically calculate
-        color difference. Learn more about OKLCH's benefits
-        <a
-          class="number"
-          href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/"
-          target="_blank"
+        to generate a perceptually uniform full-spectrum color palette, ensuring that changes in color values correspond
+        to equal changes in perceived luminosity and contrast. It supports a wider color gamut for accurate
+        representation on modern displays and uses APAC to check contrast ratios. Additionally, it employs the CIEDE2000
+        formula to scientifically calculate color difference. Learn more about OKLCH's benefits
+        <a class="number" href="https://www.smashingmagazine.com/2023/08/oklch-color-spaces-gamuts-css/" target="_blank"
           >[1]</a
         >,
-        <a
-          class="number"
-          href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl"
-          target="_blank"
+        <a class="number" href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl" target="_blank"
           >[2]</a
         >,
-        <a
-          class="number"
-          href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/"
-          target="_blank"
+        <a class="number" href="https://lea.verou.me/blog/2020/04/lch-colors-in-css-what-why-and-how/" target="_blank"
           >[3]</a
         >, and APAC's advantages
         <a href="https://ruitina.com/apca-accessible-colour-contrast/" target="_blank">here</a>.

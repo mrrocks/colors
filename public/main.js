@@ -23,9 +23,9 @@ const elements = {
 
 let palette = [];
 
-const defaultValues = {
-  lightness: 78,
-  chroma: 14,
+const defaults = {
+  lightness: 0.78,
+  chroma: 0.14,
   distance: 10,
   colorBlindMode: false,
   colorFormat: 'hex',
@@ -49,19 +49,19 @@ export function refreshGrid(isReset = false) {
 
 function getDefaultSettings() {
   return {
-    lightness: defaultValues.lightness / 100,
-    chroma: defaultValues.chroma / 100,
-    distance: defaultValues.distance,
-    colorBlindMode: defaultValues.colorBlindMode,
-    p3Mode: defaultValues.p3Mode,
-    colorFormat: defaultValues.colorFormat,
+    lightness: defaults.lightness,
+    chroma: defaults.chroma,
+    distance: defaults.distance,
+    colorBlindMode: defaults.colorBlindMode,
+    p3Mode: defaults.p3Mode,
+    colorFormat: defaults.colorFormat,
   };
 }
 
 function getCurrentSettings() {
   return {
-    lightness: parseFloat(elements.lightnessSlider.value) / 100,
-    chroma: parseFloat(elements.chromaSlider.value) / 100,
+    lightness: parseFloat(elements.lightnessSlider.value),
+    chroma: parseFloat(elements.chromaSlider.value),
     distance: parseInt(elements.distanceSlider.value),
     colorBlindMode: elements.colorBlindModeCheckbox.checked,
     p3Mode: elements.p3ModeCheckbox.checked,
@@ -107,7 +107,7 @@ function syncSliderAndInput(slider, input, defaultValue) {
 }
 
 function setupEventListeners() {
-  elements.resetButton.addEventListener('click', () => resetControls(elements, defaultValues));
+  elements.resetButton.addEventListener('click', () => resetControls(elements, defaults));
   elements.exportButton.addEventListener('click', () => exportColors(palette, elements.colorFormatSelect.value));
   elements.colorBlindModeCheckbox.addEventListener('change', () => refreshGrid());
   elements.p3ModeCheckbox.addEventListener('change', () => refreshGrid());
@@ -117,33 +117,33 @@ function setupEventListeners() {
 function initializeSettings() {
   const urlParams = getUrlParams();
   const settings = {
-    ...defaultValues,
+    ...defaults,
     ...urlParams,
     ...retrieveLocalStorageSettings(),
   };
 
   syncValues(elements.lightnessSlider, elements.lightnessValue, settings.lightness);
-  syncValues(elements.chromaSlider, elements.chromaValue, settings.chroma * 100);
+  syncValues(elements.chromaSlider, elements.chromaValue, settings.chroma);
   syncValues(elements.distanceSlider, elements.distanceValue, settings.distance);
 }
 
 function retrieveLocalStorageSettings() {
   return {
-    lightness: localStorage.getItem('lightness') || defaultValues.lightness,
-    chroma: localStorage.getItem('chroma') || defaultValues.chroma,
-    distance: localStorage.getItem('distance') || defaultValues.distance,
+    lightness: localStorage.getItem('lightness') || defaults.lightness,
+    chroma: localStorage.getItem('chroma') || defaults.chroma,
+    distance: localStorage.getItem('distance') || defaults.distance,
     colorBlindMode: localStorage.getItem('colorBlindMode') === 'true',
     p3Mode: localStorage.getItem('p3Mode') === 'true',
-    colorFormat: localStorage.getItem('colorFormat') || defaultValues.colorFormat,
+    colorFormat: localStorage.getItem('colorFormat') || defaults.colorFormat,
   };
 }
 
 function init() {
-  syncSliderAndInput(elements.lightnessSlider, elements.lightnessValue, defaultValues.lightness);
-  syncSliderAndInput(elements.chromaSlider, elements.chromaValue, defaultValues.chroma);
-  syncSliderAndInput(elements.distanceSlider, elements.distanceValue, defaultValues.distance);
+  syncSliderAndInput(elements.lightnessSlider, elements.lightnessValue, defaults.lightness);
+  syncSliderAndInput(elements.chromaSlider, elements.chromaValue, defaults.chroma);
+  syncSliderAndInput(elements.distanceSlider, elements.distanceValue, defaults.distance);
   setupEventListeners();
-  refreshGrid(true);
+  refreshGrid();
 }
 
 init();

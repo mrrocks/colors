@@ -1,30 +1,44 @@
-const formatMapping = {
+const FORMAT_MAPPING = {
   hex: 'H',
   rgb: 'R',
   oklch: 'O',
 };
 
-const reverseFormatMapping = {
+const REVERSE_FORMAT_MAPPING = {
   H: 'hex',
   R: 'rgb',
   O: 'oklch',
 };
 
+const PARAM_LENGTH = 2;
+const PERCENT_MULTIPLIER = 100;
+
 function encodeParams(params) {
-  const { lightness, chroma, distance, colorFormat, colorBlindMode, p3Mode } = params;
-  return `${lightness.padStart(2, '0')}${chroma.padStart(2, '0')}${distance.padStart(2, '0')}${formatMapping[colorFormat]}${colorBlindMode ? '1' : '0'}${p3Mode ? '1' : '0'}`;
+  const lightnessStr = Math.round(params.lightness * PERCENT_MULTIPLIER)
+    .toString()
+    .padStart(PARAM_LENGTH, '0');
+  const chromaStr = Math.round(params.chroma * PERCENT_MULTIPLIER)
+    .toString()
+    .padStart(PARAM_LENGTH, '0');
+  const distanceStr = params.distance.toString().padStart(PARAM_LENGTH, '0');
+  const colorFormatCode = FORMAT_MAPPING[params.colorFormat];
+  const colorBlindModeCode = params.colorBlindMode ? '1' : '0';
+  const p3ModeCode = params.p3Mode ? '1' : '0';
+
+  return `${lightnessStr}${chromaStr}${distanceStr}${colorFormatCode}${colorBlindModeCode}${p3ModeCode}`;
 }
 
 function decodeParams(search) {
   return {
-    lightness: search.substring(0, 2),
-    chroma: search.substring(2, 4),
-    distance: search.substring(4, 6),
-    colorFormat: reverseFormatMapping[search.charAt(6)],
+    lightness: parseInt(search.substring(0, 2), 10) / PERCENT_MULTIPLIER,
+    chroma: parseInt(search.substring(2, 4), 10) / PERCENT_MULTIPLIER,
+    distance: parseInt(search.substring(4, 6), 10),
+    colorFormat: REVERSE_FORMAT_MAPPING[search.charAt(6)],
     colorBlindMode: search.charAt(7) === '1',
     p3Mode: search.charAt(8) === '1',
   };
 }
+
 export function updateURLParameters(params) {
   const compactParams = encodeParams(params);
   history.replaceState(null, null, `?${compactParams}`);
