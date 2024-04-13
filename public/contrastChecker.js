@@ -4,21 +4,14 @@ import { APCAcontrast, sRGBtoY, alphaBlend } from 'apca-w3';
 const WHITE_RGBA = [255, 255, 255, 0.92];
 const BLACK_RGBA = [0, 0, 0, 0.92];
 
-function blendColorsWithBackground(color, backgroundColor) {
-  return alphaBlend(color, backgroundColor);
-}
+const blendColorsWithBackground = (color, backgroundColor) => alphaBlend(color, backgroundColor);
 
-function calculateLuminance(color) {
-  return sRGBtoY(color);
-}
+const calculateLuminance = (color) => sRGBtoY(color);
 
-function determineHigherContrast(contrast1, contrast2) {
-  return Math.abs(contrast1) > Math.abs(contrast2)
-    ? `rgba(${WHITE_RGBA.join(', ')})`
-    : `rgba(${BLACK_RGBA.join(', ')})`;
-}
+const determineHigherContrast = (contrast1, contrast2) =>
+  Math.abs(contrast1) > Math.abs(contrast2) ? `rgba(${WHITE_RGBA.join(', ')})` : `rgba(${BLACK_RGBA.join(', ')})`;
 
-export function contrastChecker(bgColor) {
+export const contrastChecker = (bgColor) => {
   const bgColorArray = chroma(bgColor).rgb();
 
   const blendedWhite = blendColorsWithBackground(WHITE_RGBA, bgColorArray);
@@ -32,4 +25,4 @@ export function contrastChecker(bgColor) {
   const contrastBlack = APCAcontrast(blackLum, bgLum);
 
   return determineHigherContrast(contrastWhite, contrastBlack);
-}
+};

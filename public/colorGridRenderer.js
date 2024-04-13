@@ -1,21 +1,20 @@
 import chroma from 'chroma-js';
-
 import { contrastChecker } from './contrastChecker.js';
-import colorUtils from './colorUtils.js';
+import { getColorHex, getColorObj } from './colorUtils.js';
 
-function createColorBlock(color, nextColor, firstColor) {
+const createColorBlock = (color, nextColor, firstColor) => {
   const block = document.createElement('div');
   block.className = 'color';
   block.style.backgroundColor = `oklch(${color.lightness} ${color.chroma} ${color.hue})`;
   block.innerHTML = getColorContent(color);
-  block.style.color = contrastChecker(colorUtils.getColorHex(color));
+  block.style.color = contrastChecker(getColorHex(color));
   appendDeltaSpan(block, color, nextColor || firstColor);
   return block;
-}
+};
 
-function getColorContent(color) {
+const getColorContent = (color) => {
   const format = document.getElementById('colorFormat').value;
-  const colorObj = colorUtils.getColorObj(color);
+  const colorObj = getColorObj(color);
   switch (format) {
     case 'hex':
       return colorObj.hex();
@@ -26,26 +25,33 @@ function getColorContent(color) {
     default:
       return color;
   }
-}
+};
 
-function appendDeltaSpan(block, color, comparisonColor) {
+const appendDeltaSpan = (block, color, comparisonColor) => {
   const deltaNext = formatDelta(calculateDelta(color, comparisonColor));
   const deltaSpan = document.createElement('span');
   deltaSpan.className = 'deltas';
   deltaSpan.innerHTML = deltaNext;
   deltaSpan.title = 'Relative color difference against next color';
   block.appendChild(deltaSpan);
-}
+};
 
-function calculateDelta(color, comparisonColor) {
-  return chroma.deltaE(colorUtils.getColorHex(color), colorUtils.getColorHex(comparisonColor));
-}
+const calculateDelta = (color, comparisonColor) => {
+  return chroma.deltaE(getColorHex(color), getColorHex(comparisonColor));
+};
 
-function formatDelta(delta) {
+const formatDelta = (delta) => {
   return `${(Math.round(delta * 10) / 10).toFixed(1)}% ▸`;
-}
+};
 
-function renderPalette(palette) {
+const paletteChanged = (oldPalette, newPalette) => {
+  return (
+    oldPalette.length !== newPalette.length ||
+    !oldPalette.every((val, index) => getColorHex(val) === getColorHex(newPalette[index]))
+  );
+};
+
+export const renderPalette = (palette) => {
   const grid = document.getElementById('colorGrid');
   if (palette.length === 0) {
     grid.innerHTML = '<div class="error">No colors are within the P3 color space</div>';
@@ -60,13 +66,4 @@ function renderPalette(palette) {
     });
     grid.appendChild(fragment);
   }
-}
-
-function paletteChanged(oldPalette, newPalette) {
-  return (
-    oldPalette.length !== newPalette.length ||
-    !oldPalette.every((val, index) => colorUtils.getColorHex(val) === colorUtils.getColorHex(newPalette[index]))
-  );
-}
-
-export { renderPalette };
+};

@@ -1,9 +1,9 @@
 import { generatePalette } from './paletteGenerator.js';
 import { renderPalette } from './colorGridRenderer.js';
 import { exportColors } from './exportColors.js';
-import { updateURLParameters, getUrlParams } from './urlParamsManager.js';
+import { updateURLParameters } from './urlParamsManager.js';
 import { updateSliderBackground, debounce } from './utils.js';
-import { initializeSettings, saveSettings } from './settingsManager.js';
+import { initializeSettings, saveSettings, getCurrentSettings, settingsHaveChanged } from './settingsManager.js';
 
 const elements = {
   colorCount: document.getElementById('colorCount'),
@@ -37,6 +37,7 @@ const refreshGrid = (settings) => {
   requestAnimationFrame(() => {
     const palette = generatePalette(settings);
     renderPalette(palette);
+    setSelectState(settings);
     syncAllSliders(settings);
     setCheckboxStates(settings);
     saveSettings(settings);
@@ -45,22 +46,7 @@ const refreshGrid = (settings) => {
   });
 };
 
-const getCurrentSettings = () => ({
-  lightness: parseFloat(elements.lightnessSlider.value),
-  chroma: parseFloat(elements.chromaSlider.value),
-  distance: parseInt(elements.distanceSlider.value),
-  colorBlindMode: elements.colorBlindModeCheckbox.checked,
-  p3Mode: elements.p3ModeCheckbox.checked,
-  colorFormat: elements.colorFormatSelect.value,
-});
-
-let lastSettings = {};
-
-const settingsHaveChanged = (newSettings) => {
-  return Object.keys(newSettings).some((key) => newSettings[key] !== lastSettings[key]);
-};
-
-const refreshGridIfNeeded = (settings) => {
+export const refreshGridIfNeeded = (settings) => {
   if (settingsHaveChanged(settings)) {
     refreshGrid(settings);
     lastSettings = { ...settings };
@@ -68,7 +54,7 @@ const refreshGridIfNeeded = (settings) => {
 };
 
 const debounceRefreshGridIfNeeded = debounce(() => {
-  refreshGridIfNeeded(getCurrentSettings());
+  refreshGridIfNeeded(getCurrentSettings(elements));
 }, 10);
 
 const syncValues = (slider, input, value) => {
@@ -88,6 +74,10 @@ const setupSliderSync = (slider, input) => {
   input.addEventListener('input', handleInput);
   slider.addEventListener('change', handleInput);
   input.addEventListener('change', handleInput);
+};
+
+const setSelectState = (settings) => {
+  elements.colorFormatSelect.value = settings.colorFormat;
 };
 
 const syncAllSliders = (settings) => {
@@ -110,7 +100,7 @@ const setupEventListeners = () => {
   elements.p3ModeCheckbox.addEventListener('change', debounceRefreshGridIfNeeded);
   elements.colorFormatSelect.addEventListener('change', debounceRefreshGridIfNeeded);
   elements.exportButton.addEventListener('click', () =>
-    exportColors(generatePalette(getCurrentSettings()), elements.colorFormatSelect.value),
+    exportColors(generatePalette(getCurrentSettings(elements)), elements.colorFormatSelect.value),
   );
   elements.resetButton.addEventListener('click', () => {
     refreshGrid(defaults);

@@ -1,9 +1,9 @@
 import chroma from 'chroma-js';
 
-function exportColors(palette, format) {
-  let colorText = palette
+export const exportColors = (palette, format) => {
+  const colorText = palette
     .map((color) => {
-      let colorObj = chroma.oklch(color.lightness, color.chroma, color.hue);
+      const colorObj = chroma.oklch(color.lightness, color.chroma, color.hue);
       switch (format) {
         case 'hex':
           return colorObj.hex();
@@ -24,6 +24,4 @@ function exportColors(palette, format) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-}
-
-export { exportColors };
+};

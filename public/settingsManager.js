@@ -1,13 +1,31 @@
 import { getUrlParams } from './urlParamsManager.js';
 
-export function saveSettings(settings) {
+let lastSettings = {};
+
+export const settingsHaveChanged = (newSettings) => {
+  return Object.keys(newSettings).some((key) => newSettings[key] !== lastSettings[key]);
+};
+
+export const getCurrentSettings = (elements) => {
+  console.log(elements);
+  return {
+    lightness: parseFloat(elements.lightnessSlider.value),
+    chroma: parseFloat(elements.chromaSlider.value),
+    distance: parseInt(elements.distanceSlider.value),
+    colorBlindMode: elements.colorBlindModeCheckbox.checked,
+    p3Mode: elements.p3ModeCheckbox.checked,
+    colorFormat: elements.colorFormatSelect.value,
+  };
+};
+
+export const saveSettings = (settings) => {
   localStorage.clear();
   Object.entries(settings).forEach(([key, value]) => {
     localStorage.setItem(key, value);
   });
-}
+};
 
-export function retrieveLocalStorageSettings() {
+export const retrieveLocalStorageSettings = () => {
   const settings = {};
   const keys = ['lightness', 'chroma', 'distance', 'colorFormat', 'colorBlindMode', 'p3Mode'];
   keys.forEach((key) => {
@@ -23,11 +41,11 @@ export function retrieveLocalStorageSettings() {
     }
   });
   return settings;
-}
+};
 
-export function initializeSettings(defaults) {
+export const initializeSettings = (defaults) => {
   const urlParams = getUrlParams();
   const localStorageSettings = retrieveLocalStorageSettings();
   const settings = { ...defaults, ...localStorageSettings, ...urlParams };
   return settings;
-}
+};

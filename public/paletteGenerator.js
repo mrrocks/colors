@@ -2,9 +2,9 @@ import chroma from 'chroma-js';
 import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
-import colorUtils from './colorUtils.js';
+import { getColorHex } from './colorUtils.js';
 
-export function generatePalette(options) {
+export const generatePalette = (options) => {
   const { lightness, chroma, distance, colorBlindMode, p3Mode } = options;
   const uniqueColors = [];
   const colorCache = new Map();
@@ -18,48 +18,45 @@ export function generatePalette(options) {
     }
   }
   return uniqueColors;
-}
+};
 
-function shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode) {
+const shouldAddColor = (color, uniqueColors, distance, colorBlindMode, p3Mode) => {
   if (p3Mode && !isInP3Gamut(color)) {
     return false;
   }
   return isDistinctColor(color, uniqueColors, distance, colorBlindMode);
-}
+};
 
-function isInP3Gamut(color) {
+const isInP3Gamut = (color) => {
   const colorJS = new Color(`oklch(${color.lightness} ${color.chroma} ${color.hue})`);
   return colorJS.inGamut('p3');
-}
+};
 
-function isDistinctColor(color, uniqueColors, distance, colorBlindMode) {
-  for (const uniqueColor of uniqueColors) {
+const isDistinctColor = (color, uniqueColors, distance, colorBlindMode) => {
+  return uniqueColors.every((uniqueColor) => {
     let distanceCalc = calculateColorDistance(color, uniqueColor);
     if (colorBlindMode) {
       distanceCalc = adjustForColorBlindness(color, uniqueColor, distanceCalc);
     }
-    if (distanceCalc < distance) {
-      return false;
-    }
-  }
-  return true;
-}
+    return distanceCalc >= distance;
+  });
+};
 
-function calculateColorDistance(color, uniqueColor) {
+const calculateColorDistance = (color, uniqueColor) => {
   return chroma.deltaE(
     chroma.oklch(color.lightness, color.chroma, color.hue),
     chroma.oklch(uniqueColor.lightness, uniqueColor.chroma, uniqueColor.hue),
   );
-}
+};
 
-function adjustForColorBlindness(color, uniqueColor, originalDistance) {
-  const colorHex = colorUtils.getColorHex(color);
-  const uniqueColorHex = colorUtils.getColorHex(uniqueColor);
+const adjustForColorBlindness = (color, uniqueColor, originalDistance) => {
+  const colorHex = getColorHex(color);
+  const uniqueColorHex = getColorHex(uniqueColor);
   const colorDeuteranomaly = getDeuteranomaly(colorHex);
   const comparisonColorDeuteranomaly = getDeuteranomaly(uniqueColorHex);
   return Math.min(originalDistance, chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly));
-}
+};
 
-function getDeuteranomaly(colorHex) {
+const getDeuteranomaly = (colorHex) => {
   return blinder.deuteranomaly(colorHex);
-}
+};

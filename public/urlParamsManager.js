@@ -13,7 +13,7 @@ const REVERSE_FORMAT_MAPPING = {
 const PARAM_LENGTH = 2;
 const PERCENT_MULTIPLIER = 100;
 
-function encodeParams(params) {
+const encodeParams = (params) => {
   const lightnessStr = Math.round(params.lightness * PERCENT_MULTIPLIER)
     .toString()
     .padStart(PARAM_LENGTH, '0');
@@ -26,9 +26,9 @@ function encodeParams(params) {
   const p3ModeCode = params.p3Mode ? '1' : '0';
 
   return `${lightnessStr}${chromaStr}${distanceStr}${colorFormatCode}${colorBlindModeCode}${p3ModeCode}`;
-}
+};
 
-function decodeParams(search) {
+const decodeParams = (search) => {
   const lightness = parseInt(search.substring(0, 2), 10) / PERCENT_MULTIPLIER;
   const chroma = parseInt(search.substring(2, 4), 10) / PERCENT_MULTIPLIER;
   const distance = parseInt(search.substring(4, 6), 10);
@@ -37,17 +37,14 @@ function decodeParams(search) {
   const p3Mode = search.charAt(8) === '1';
 
   return { lightness, chroma, distance, colorFormat, colorBlindMode, p3Mode };
-}
+};
 
-export function updateURLParameters(params) {
+export const updateURLParameters = (params) => {
   const compactParams = encodeParams(params);
   history.replaceState(null, null, `?${compactParams}`);
-}
+};
 
-export function getUrlParams() {
+export const getUrlParams = () => {
   const search = window.location.search.substring(1);
-  if (search) {
-    return decodeParams(search);
-  }
-  return {};
-}
+  return search ? decodeParams(search) : {};
+};

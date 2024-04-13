@@ -1,10 +1,10 @@
-export function updateSliderBackground(slider, value) {
+export const updateSliderBackground = (slider, value) => {
   slider.style.backgroundSize = `${((value - slider.min) / (slider.max - slider.min)) * 100}% 100%`;
-}
+};
 
-export function debounce(func, wait) {
+export const debounce = (func, wait) => {
   let timeout;
-  return function executedFunction(...args) {
+  return (...args) => {
     const later = () => {
       clearTimeout(timeout);
       func(...args);
@@ -12,4 +12,4 @@ export function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
-}
+};
