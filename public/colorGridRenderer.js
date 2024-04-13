@@ -1,21 +1,21 @@
 import chroma from 'chroma-js';
 
 import { contrastChecker } from './contrastChecker.js';
-import { getColorHex, getColorObj } from './colorUtils.js';
+import colorUtils from './colorUtils.js';
 
 function createColorBlock(color, nextColor, firstColor) {
   const block = document.createElement('div');
   block.className = 'color';
   block.style.backgroundColor = `oklch(${color.lightness} ${color.chroma} ${color.hue})`;
   block.innerHTML = getColorContent(color);
-  block.style.color = contrastChecker(getColorHex(color));
+  block.style.color = contrastChecker(colorUtils.getColorHex(color));
   appendDeltaSpan(block, color, nextColor || firstColor);
   return block;
 }
 
 function getColorContent(color) {
   const format = document.getElementById('colorFormat').value;
-  const colorObj = getColorObj(color);
+  const colorObj = colorUtils.getColorObj(color);
   switch (format) {
     case 'hex':
       return colorObj.hex();
@@ -38,7 +38,7 @@ function appendDeltaSpan(block, color, comparisonColor) {
 }
 
 function calculateDelta(color, comparisonColor) {
-  return chroma.deltaE(getColorHex(color), getColorHex(comparisonColor));
+  return chroma.deltaE(colorUtils.getColorHex(color), colorUtils.getColorHex(comparisonColor));
 }
 
 function formatDelta(delta) {
@@ -65,7 +65,7 @@ function renderPalette(palette) {
 function paletteChanged(oldPalette, newPalette) {
   return (
     oldPalette.length !== newPalette.length ||
-    !oldPalette.every((val, index) => getColorHex(val) === getColorHex(newPalette[index]))
+    !oldPalette.every((val, index) => colorUtils.getColorHex(val) === colorUtils.getColorHex(newPalette[index]))
   );
 }
 

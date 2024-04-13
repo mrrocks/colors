@@ -2,7 +2,7 @@ import chroma from 'chroma-js';
 import blinder from 'color-blind';
 import Color from 'colorjs.io';
 
-import { getColorHex } from './colorUtils.js';
+import colorUtils from './colorUtils.js';
 
 export function generatePalette(options) {
   const { lightness, chroma, distance, colorBlindMode, p3Mode } = options;
@@ -58,8 +58,8 @@ function calculateColorDistance(color, uniqueColor) {
 }
 
 function adjustForColorBlindness(color, uniqueColor, originalDistance) {
-  const colorHex = getColorHex(color);
-  const uniqueColorHex = getColorHex(uniqueColor);
+  const colorHex = colorUtils.getColorHex(color);
+  const uniqueColorHex = colorUtils.getColorHex(uniqueColor);
   const colorDeuteranomaly = getDeuteranomaly(colorHex);
   const comparisonColorDeuteranomaly = getDeuteranomaly(uniqueColorHex);
   return Math.min(originalDistance, chroma.deltaE(colorDeuteranomaly, comparisonColorDeuteranomaly));
@@ -67,10 +67,6 @@ function adjustForColorBlindness(color, uniqueColor, originalDistance) {
 
 function getDeuteranomaly(colorHex) {
   return blinder.deuteranomaly(colorHex);
-}
-
-function getColorHex(color) {
-  return chroma.oklch(color.lightness, color.chroma, color.hue).hex();
 }
 
 function getDeuteranomaly(colorHex) {
