@@ -78,14 +78,16 @@ const syncValues = (slider, input, value) => {
 };
 
 const setupSliderSync = (slider, input) => {
-  const handleInput = () => {
-    const value = slider.type === 'range' ? slider.value : input.value;
+  const handleInput = (event) => {
+    const value = event.target.value;
     syncValues(slider, input, value);
     debounceRefreshGridIfNeeded();
   };
 
   slider.addEventListener('input', handleInput);
   input.addEventListener('input', handleInput);
+  slider.addEventListener('change', handleInput);
+  input.addEventListener('change', handleInput);
 };
 
 const syncAllSliders = (settings) => {

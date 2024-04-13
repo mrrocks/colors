@@ -1,9 +1,8 @@
-import chroma from 'chroma-js'; // Ensure you import the library
+import chroma from 'chroma-js';
 
 function exportColors(palette, format) {
   let colorText = palette
     .map((color) => {
-      // Assuming color is an object with properties lightness, chroma, and hue
       let colorObj = chroma.oklch(color.lightness, color.chroma, color.hue);
       switch (format) {
         case 'hex':
