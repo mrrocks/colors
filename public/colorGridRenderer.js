@@ -1,20 +1,16 @@
 import chroma from 'chroma-js';
-import { contrastChecker } from './contrastChecker.js';
 
-const colorCache = new Map();
+import { contrastChecker } from './contrastChecker.js';
+import { getColorHex, getColorObj } from './colorUtils.js';
 
 function createColorBlock(color, nextColor, firstColor) {
   const block = document.createElement('div');
   block.className = 'color';
-  block.style.backgroundColor = getColorStyle(color);
+  block.style.backgroundColor = `oklch(${color.lightness} ${color.chroma} ${color.hue})`;
   block.innerHTML = getColorContent(color);
   block.style.color = contrastChecker(getColorHex(color));
   appendDeltaSpan(block, color, nextColor || firstColor);
   return block;
-}
-
-function getColorStyle(color) {
-  return `oklch(${color.lightness} ${color.chroma} ${color.hue})`;
 }
 
 function getColorContent(color) {
@@ -30,18 +26,6 @@ function getColorContent(color) {
     default:
       return color;
   }
-}
-
-function getColorObj(color) {
-  const key = JSON.stringify(color);
-  if (!colorCache.has(key)) {
-    colorCache.set(key, chroma.oklch(...Object.values(color)));
-  }
-  return colorCache.get(key);
-}
-
-function getColorHex(color) {
-  return getColorObj(color).hex();
 }
 
 function appendDeltaSpan(block, color, comparisonColor) {

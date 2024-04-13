@@ -2,8 +2,8 @@ import { generatePalette } from './paletteGenerator.js';
 import { renderPalette } from './colorGridRenderer.js';
 import { exportColors } from './exportColors.js';
 import { updateURLParameters, getUrlParams } from './urlParamsManager.js';
-import { saveSettings } from './saveSettings.js';
 import { updateSliderBackground, debounce } from './utils.js';
+import { initializeSettings, saveSettings } from './settingsManager.js';
 
 const elements = {
   colorCount: document.getElementById('colorCount'),
@@ -121,35 +121,10 @@ const setupEventListeners = () => {
   setupSliderSync(elements.distanceSlider, elements.distanceValue);
 };
 
-const retrieveLocalStorageSettings = () => {
-  const settings = {};
-  const keys = ['lightness', 'chroma', 'distance', 'colorFormat', 'colorBlindMode', 'p3Mode'];
-  keys.forEach((key) => {
-    const value = localStorage.getItem(key);
-    if (value !== null) {
-      if (key === 'colorBlindMode' || key === 'p3Mode') {
-        settings[key] = value === 'true';
-      } else if (key === 'colorFormat') {
-        settings[key] = value;
-      } else {
-        settings[key] = parseFloat(value);
-      }
-    }
-  });
-  return settings;
-};
-
-const initializeSettings = () => {
-  const urlParams = getUrlParams();
-  const localStorageSettings = retrieveLocalStorageSettings();
-  const settings = { ...defaults, ...localStorageSettings, ...urlParams };
-
-  refreshGrid(settings);
-};
-
 const init = () => {
   setupEventListeners();
-  initializeSettings();
+  const settings = initializeSettings(defaults);
+  refreshGrid(settings);
 };
 
 document.addEventListener('DOMContentLoaded', init);
