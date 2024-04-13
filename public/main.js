@@ -95,8 +95,12 @@ const syncAllSliders = (settings) => {
 };
 
 const setCheckboxStates = (settings) => {
-  elements.colorBlindModeCheckbox.checked = settings.colorBlindMode;
-  elements.p3ModeCheckbox.checked = settings.p3Mode;
+  if (elements.colorBlindModeCheckbox.checked !== settings.colorBlindMode) {
+    elements.colorBlindModeCheckbox.checked = settings.colorBlindMode;
+  }
+  if (elements.p3ModeCheckbox.checked !== settings.p3Mode) {
+    elements.p3ModeCheckbox.checked = settings.p3Mode;
+  }
 };
 
 const setupEventListeners = () => {
