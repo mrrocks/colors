@@ -36,11 +36,11 @@ const updateCount = (length) => {
 const refreshGrid = (settings) => {
   requestAnimationFrame(() => {
     const palette = generatePalette(settings);
-    updateCount(palette.length);
     renderPalette(palette);
     syncAllSliders(settings);
     saveSettings(settings);
     updateURLParameters(settings);
+    updateCount(palette.length);
   });
 };
 
@@ -53,23 +53,38 @@ const getCurrentSettings = () => ({
   colorFormat: elements.colorFormatSelect.value,
 });
 
+let lastSettings = {};
+
+const settingsHaveChanged = (newSettings) => {
+  return Object.keys(newSettings).some((key) => newSettings[key] !== lastSettings[key]);
+};
+
+const refreshGridIfNeeded = (settings) => {
+  if (settingsHaveChanged(settings)) {
+    refreshGrid(settings);
+    lastSettings = { ...settings };
+  }
+};
+
+const debounceRefreshGridIfNeeded = debounce(() => {
+  refreshGridIfNeeded(getCurrentSettings());
+}, 10);
+
 const syncValues = (slider, input, value) => {
-  slider.value = value;
-  input.value = value;
+  if (slider.value !== value) slider.value = value;
+  if (input.value !== value) input.value = value;
   updateSliderBackground(slider, value);
 };
 
-const syncSliderAndInput = (slider, input) => {
-  const debouncedRefreshGrid = debounce(() => refreshGrid(getCurrentSettings()), 5);
+const setupSliderSync = (slider, input) => {
+  const handleInput = () => {
+    const value = slider.type === 'range' ? slider.value : input.value;
+    syncValues(slider, input, value);
+    debounceRefreshGridIfNeeded();
+  };
 
-  slider.oninput = () => {
-    syncValues(slider, input, slider.value);
-    debouncedRefreshGrid();
-  };
-  input.oninput = () => {
-    syncValues(slider, input, input.value);
-    debouncedRefreshGrid();
-  };
+  slider.addEventListener('input', handleInput);
+  input.addEventListener('input', handleInput);
 };
 
 const syncAllSliders = (settings) => {
@@ -79,9 +94,9 @@ const syncAllSliders = (settings) => {
 };
 
 const setupEventListeners = () => {
-  elements.colorBlindModeCheckbox.addEventListener('change', () => refreshGrid(getCurrentSettings()));
-  elements.p3ModeCheckbox.addEventListener('change', () => refreshGrid(getCurrentSettings()));
-  elements.colorFormatSelect.addEventListener('change', () => refreshGrid(getCurrentSettings()));
+  elements.colorBlindModeCheckbox.addEventListener('change', debounceRefreshGridIfNeeded);
+  elements.p3ModeCheckbox.addEventListener('change', debounceRefreshGridIfNeeded);
+  elements.colorFormatSelect.addEventListener('change', debounceRefreshGridIfNeeded);
   elements.exportButton.addEventListener('click', () =>
     exportColors(generatePalette(getCurrentSettings()), elements.colorFormatSelect.value),
   );
@@ -89,23 +104,29 @@ const setupEventListeners = () => {
     refreshGrid(defaults);
   });
 
-  syncSliderAndInput(elements.lightnessSlider, elements.lightnessValue);
-  syncSliderAndInput(elements.chromaSlider, elements.chromaValue);
-  syncSliderAndInput(elements.distanceSlider, elements.distanceValue);
+  setupSliderSync(elements.lightnessSlider, elements.lightnessValue);
+  setupSliderSync(elements.chromaSlider, elements.chromaValue);
+  setupSliderSync(elements.distanceSlider, elements.distanceValue);
 };
 
-const retrieveLocalStorageSettings = () => ({
-  lightness: parseFloat(localStorage.getItem('lightness')),
-  chroma: parseFloat(localStorage.getItem('chroma')),
-  distance: parseInt(localStorage.getItem('distance')),
-  colorFormat: localStorage.getItem('colorFormat'),
-  colorBlindMode: localStorage.getItem('colorBlindMode') === 'true',
-  p3Mode: localStorage.getItem('p3Mode') === 'true',
-});
+const retrieveLocalStorageSettings = () => {
+  const settings = {};
+
+  const keys = ['lightness', 'chroma', 'distance', 'colorFormat', 'colorBlindMode', 'p3Mode'];
+  keys.forEach((key) => {
+    const value = localStorage.getItem(key);
+    if (value !== null) {
+      settings[key] = key === 'colorBlindMode' || key === 'p3Mode' ? value === 'true' : parseFloat(value);
+    }
+  });
+
+  return settings;
+};
 
 const initializeSettings = () => {
   const urlParams = getUrlParams();
   const localStorageSettings = retrieveLocalStorageSettings();
+  console.log(retrieveLocalStorageSettings());
   const settings = { ...defaults, ...localStorageSettings, ...urlParams };
 
   refreshGrid(settings);
@@ -116,6 +137,4 @@ const init = () => {
   initializeSettings();
 };
 
-document.addEventListener('DOMContentLoaded', function () {
-  init();
-});
+document.addEventListener('DOMContentLoaded', init);
