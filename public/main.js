@@ -38,6 +38,7 @@ const refreshGrid = (settings) => {
     const palette = generatePalette(settings);
     renderPalette(palette);
     syncAllSliders(settings);
+    setCheckboxStates(settings);
     saveSettings(settings);
     updateURLParameters(settings);
     updateCount(palette.length);
@@ -91,6 +92,11 @@ const syncAllSliders = (settings) => {
   syncValues(elements.lightnessSlider, elements.lightnessValue, settings.lightness);
   syncValues(elements.chromaSlider, elements.chromaValue, settings.chroma);
   syncValues(elements.distanceSlider, elements.distanceValue, settings.distance);
+};
+
+const setCheckboxStates = (settings) => {
+  elements.colorBlindModeCheckbox.checked = settings.colorBlindMode;
+  elements.p3ModeCheckbox.checked = settings.p3Mode;
 };
 
 const setupEventListeners = () => {
