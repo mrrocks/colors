@@ -10,19 +10,14 @@ export function generatePalette(options) {
   const colorCache = new Map();
 
   for (let hue = 0; hue < 360; hue += 2) {
-    const color = createColor(lightness, chroma, hue);
+    const color = { lightness, chroma, hue };
     const colorKey = `${lightness}-${chroma}-${hue}`;
     if (!colorCache.has(colorKey) && shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode)) {
       uniqueColors.push(color);
       colorCache.set(colorKey, color);
     }
   }
-
   return uniqueColors;
-}
-
-function createColor(lightness, chroma, hue) {
-  return { lightness, chroma, hue };
 }
 
 function shouldAddColor(color, uniqueColors, distance, colorBlindMode, p3Mode) {
