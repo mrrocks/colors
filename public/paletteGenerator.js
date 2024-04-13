@@ -68,7 +68,3 @@ function adjustForColorBlindness(color, uniqueColor, originalDistance) {
 function getDeuteranomaly(colorHex) {
   return blinder.deuteranomaly(colorHex);
 }
-
-function getDeuteranomaly(colorHex) {
-  return blinder.deuteranomaly(colorHex);
-}
