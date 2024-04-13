@@ -111,22 +111,25 @@ const setupEventListeners = () => {
 
 const retrieveLocalStorageSettings = () => {
   const settings = {};
-
   const keys = ['lightness', 'chroma', 'distance', 'colorFormat', 'colorBlindMode', 'p3Mode'];
   keys.forEach((key) => {
     const value = localStorage.getItem(key);
     if (value !== null) {
-      settings[key] = key === 'colorBlindMode' || key === 'p3Mode' ? value === 'true' : parseFloat(value);
+      if (key === 'colorBlindMode' || key === 'p3Mode') {
+        settings[key] = value === 'true';
+      } else if (key === 'colorFormat') {
+        settings[key] = value;
+      } else {
+        settings[key] = parseFloat(value);
+      }
     }
   });
-
   return settings;
 };
 
 const initializeSettings = () => {
   const urlParams = getUrlParams();
   const localStorageSettings = retrieveLocalStorageSettings();
-  console.log(retrieveLocalStorageSettings());
   const settings = { ...defaults, ...localStorageSettings, ...urlParams };
 
   refreshGrid(settings);

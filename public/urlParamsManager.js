@@ -45,12 +45,9 @@ export function updateURLParameters(params) {
 }
 
 export function getUrlParams() {
-  const searchParams = new URLSearchParams(window.location.search);
-  const parameters = {};
-
-  for (const [key, value] of searchParams) {
-    parameters[key] = value;
+  const search = window.location.search.substring(1);
+  if (search) {
+    return decodeParams(search);
   }
-
-  return parameters;
+  return {};
 }
