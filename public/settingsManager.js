@@ -7,7 +7,6 @@ export const settingsHaveChanged = (newSettings) => {
 };
 
 export const getCurrentSettings = (elements) => {
-  console.log(elements);
   return {
     lightness: parseFloat(elements.lightnessSlider.value),
     chroma: parseFloat(elements.chromaSlider.value),
