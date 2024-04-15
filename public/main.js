@@ -29,6 +29,8 @@ const defaults = {
   p3Mode: false,
 };
 
+let lastSettings = {};
+
 const updateCount = (length) => {
   elements.colorCount.textContent = length;
 };
